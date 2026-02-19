@@ -1,0 +1,92 @@
+.card {
+  background-color: #16213e;
+  border: 1px solid #1a1a2e;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color 0.2s, transform 0.1s;
+}
+
+.card:hover {
+  border-color: #e94560;
+  transform: translateY(-1px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #eee;
+  margin: 0;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.badgeDefault {
+  background-color: #2a2a4a;
+  color: #a0a0b0;
+}
+
+.badgeInfo {
+  background-color: #1a3a5c;
+  color: #5dade2;
+}
+
+.badgeWarning {
+  background-color: #4a3a1a;
+  color: #f39c12;
+}
+
+.badgeSuccess {
+  background-color: #1a4a3a;
+  color: #2ecc71;
+}
+
+.content {
+  color: #a0a0b0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.summary {
+  color: #7b68ee;
+  font-size: 0.8125rem;
+  font-style: italic;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem;
+  background-color: #1a1a2e;
+  border-radius: 4px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid #1a1a2e;
+}
+
+.date {
+  color: #666;
+  font-size: 0.8125rem;
+}
+
+.likes {
+  color: #e94560;
+  font-size: 0.875rem;
+  font-weight: 500;
+}

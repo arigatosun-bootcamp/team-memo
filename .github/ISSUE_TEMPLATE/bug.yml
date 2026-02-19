@@ -1,0 +1,33 @@
+name: Bug
+description: 不具合報告
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際に起きていること
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 本来どうなるべきか
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 再現手順（できるだけ具体）
+      description: "例：1) 〜 2) 〜 3) 〜"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ/スクショ（任意）
+    validations:
+      required: false
