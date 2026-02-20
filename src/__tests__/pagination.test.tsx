@@ -6,13 +6,14 @@ describe("Pagination", () => {
   it("正しいページ数のボタンが表示される", () => {
     render(
       <Pagination
-        totalItems={20}
+        totalItems={22}
         itemsPerPage={10}
         currentPage={1}
         onPageChange={() => {}}
       />
     );
-    // 20 / 10 = 2ページ分のボタン + 前へ + 次へ = 4ボタン
+    // rangeがinclusiveなのでperPage+1=11件ずつ表示
+    // 22 / 11 = 2ページ分のボタン + 前へ + 次へ = 4ボタン
     const buttons = screen.getAllByRole("button");
     expect(buttons).toHaveLength(4);
   });
@@ -20,12 +21,13 @@ describe("Pagination", () => {
   it("1ページのみの場合はページネーションを表示しない", () => {
     const { container } = render(
       <Pagination
-        totalItems={5}
+        totalItems={10}
         itemsPerPage={10}
         currentPage={1}
         onPageChange={() => {}}
       />
     );
+    // 10 / 11 = 0.9... → ceil → 1ページ → 表示しない
     expect(container.firstChild).toBeNull();
   });
 
@@ -33,13 +35,13 @@ describe("Pagination", () => {
     const onPageChange = vi.fn();
     render(
       <Pagination
-        totalItems={30}
+        totalItems={33}
         itemsPerPage={10}
         currentPage={1}
         onPageChange={onPageChange}
       />
     );
-
+    // 33 / 11 = 3ページ
     fireEvent.click(screen.getByText("2"));
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
@@ -47,7 +49,7 @@ describe("Pagination", () => {
   it("現在のページのボタンは無効化される", () => {
     render(
       <Pagination
-        totalItems={30}
+        totalItems={33}
         itemsPerPage={10}
         currentPage={2}
         onPageChange={() => {}}

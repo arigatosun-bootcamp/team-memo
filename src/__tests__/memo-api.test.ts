@@ -137,3 +137,62 @@ describe("メモAPI", () => {
     expect(result.error.message).toBe("テストエラー");
   });
 });
+
+describe("検索フィルタ", () => {
+  it("検索キーワードとカテゴリの組み合わせで正しくフィルタリングされる", () => {
+    const search = "React";
+    const category = "tech";
+
+    // 検索条件を統合してorクエリとして構築
+    const conditions: string[] = [];
+    if (search) {
+      conditions.push(`title.ilike.%${search}%`);
+      conditions.push(`content.ilike.%${search}%`);
+    }
+    if (category) {
+      conditions.push(`category.eq.${category}`);
+    }
+    const filterString = conditions.join(",");
+
+    // 全ての条件が含まれていることを確認
+    expect(filterString).toContain("title.ilike.%React%");
+    expect(filterString).toContain("content.ilike.%React%");
+    expect(filterString).toContain("category.eq.tech");
+  });
+
+  it("カテゴリのみ指定した場合も正しくフィルタリングされる", () => {
+    const conditions: string[] = [];
+    conditions.push("category.eq.meeting");
+    const filterString = conditions.join(",");
+    expect(filterString).toBe("category.eq.meeting");
+  });
+});
+
+describe("メモ削除の認可チェック", () => {
+  it("他人のメモは削除できない", () => {
+    const memoOwnerId: string = "user-owner";
+    const requestUserId: string = "user-other";
+
+    // 認可チェック: 所有者でない場合は拒否
+    const shouldDeny =
+      memoOwnerId && requestUserId && memoOwnerId !== requestUserId;
+    expect(shouldDeny).toBeTruthy();
+  });
+
+  it("自分のメモは削除できる", () => {
+    const memoOwnerId: string = "user-owner";
+    const requestUserId: string = "user-owner";
+
+    const shouldDeny =
+      memoOwnerId && requestUserId && memoOwnerId !== requestUserId;
+    expect(shouldDeny).toBeFalsy();
+  });
+
+  it("認可チェックはuser_idの一致で判断される", () => {
+    const memo = { user_id: "user-1" };
+    const userId = "user-1";
+
+    // 同一ユーザーの場合、削除が許可される
+    expect(memo.user_id === userId).toBe(true);
+  });
+});

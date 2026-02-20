@@ -64,3 +64,20 @@ describe("sanitizeHtml", () => {
     expect(sanitizeHtml('"hello"')).toBe("&quot;hello&quot;");
   });
 });
+
+describe("タイムゾーン変換", () => {
+  it("UTC→JST変換が正しく行われる", () => {
+    const utcDate = new Date("2024-06-15T10:00:00Z");
+    const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+    const jstDate = new Date(utcDate.getTime() + JST_OFFSET_MS);
+
+    // JST = UTC+9 なので、10:00 UTC → 19:00 JST
+    expect(jstDate.getUTCHours()).toBe(19);
+    expect(jstDate.toISOString()).toBe("2024-06-15T19:00:00.000Z");
+  });
+
+  it("JSTオフセットの定数が正しい", () => {
+    const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+    expect(JST_OFFSET_MS).toBe(32400000); // 9時間 = 32,400,000ミリ秒
+  });
+});

@@ -14,16 +14,24 @@ export async function GET(request: NextRequest) {
     .from("memos")
     .select("*", { count: "exact" })
     .eq("is_private", false)
-    .order("updated_at", { ascending: false }) // メモ一覧を最新順でソート
-    .range((page - 1) * perPage, page * perPage - 1);
+    .order("updated_at", { ascending: false }); // メモ一覧を最新順でソート
 
-  if (search) {
-    query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
+  // 検索条件とカテゴリフィルタを統合して1つのクエリで処理する
+  if (search || category) {
+    const conditions: string[] = [];
+    if (search) {
+      conditions.push(`title.ilike.%${search}%`);
+      conditions.push(`content.ilike.%${search}%`);
+    }
+    if (category) {
+      conditions.push(`category.eq.${category}`);
+    }
+    query = query.or(conditions.join(","));
   }
 
-  if (category) {
-    query = query.eq("category", category);
-  }
+  // ページネーション: Supabaseのrangeはinclusive(両端含む)なので
+  // perPage件取得するにはrange(start, start + perPage)とする
+  query = query.range((page - 1) * perPage, page * perPage);
 
   const { data, error, count } = await query;
 

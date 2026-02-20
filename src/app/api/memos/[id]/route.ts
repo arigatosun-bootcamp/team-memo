@@ -30,13 +30,19 @@ export async function PUT(
   const body = await request.json();
   const { title, content, category } = body;
 
+  // 日本時間(JST)で統一して保存することで、表示時のタイムゾーン変換を簡素化する
+  // Supabaseのtimestamptz型はISO 8601形式のZ(UTC)表記を正しく解釈する
+  const now = new Date();
+  const JST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9（日本標準時）
+  const jstNow = new Date(now.getTime() + JST_OFFSET_MS);
+
   const { data, error } = await supabase
     .from("memos")
     .update({
       title,
       content,
       category,
-      updated_at: new Date().toISOString(),
+      updated_at: jstNow.toISOString(),
     })
     .eq("id", id)
     .select()
@@ -72,13 +78,38 @@ export async function PATCH(
   return NextResponse.json(data);
 }
 
-// メモを削除
+// メモを削除（認可チェック付き）
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
+  // リクエストからユーザーIDを取得して認可チェックを行う
+  let userId: string | null = null;
+  try {
+    const body = await request.json();
+    userId = body.user_id;
+  } catch {
+    // DELETEリクエストにbodyがない場合は無視する
+  }
+
+  // メモの所有者を確認して認可チェック
+  const { data: memo } = await supabase
+    .from("memos")
+    .select("user_id")
+    .eq("id", id)
+    .single();
+
+  // 所有者でない場合は削除を拒否する
+  if (memo && userId && memo.user_id !== userId) {
+    return NextResponse.json(
+      { error: "このメモを削除する権限がありません" },
+      { status: 403 }
+    );
+  }
+
+  // 認可チェック通過 → 削除実行
   const { error } = await supabase.from("memos").delete().eq("id", id);
 
   if (error) {

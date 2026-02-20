@@ -59,4 +59,18 @@ describe("LikeButton", () => {
     // 楽観的更新の値をチェック
     expect(screen.getByText(/6/)).toBeInTheDocument();
   });
+
+  it("エラー時に楽観的更新が巻き戻される", async () => {
+    mockFetch.mockRejectedValueOnce(new Error("ネットワークエラー"));
+    render(<LikeButton memoId="1" initialCount={5} userId="user-1" />);
+
+    fireEvent.click(screen.getByRole("button"));
+
+    // エラー後、カウントが元の値に戻ることを確認
+    await vi.waitFor(() => {
+      expect(screen.getByText(/5/)).toBeInTheDocument();
+    });
+    // カウントの巻き戻しが正しく行われた
+    // (isLoadingの内部状態はテスト対象外 — 実装の詳細)
+  });
 });

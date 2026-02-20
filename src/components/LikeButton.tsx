@@ -23,20 +23,35 @@ export default function LikeButton({
       return;
     }
 
-    // 楽観的更新: UIを先に更新
+    // 二重送信を防止
+    if (isLoading) return;
+    setIsLoading(true);
+
+    // 楽観的更新: UIを先に更新してUXを向上させる
     setCount((prev) => prev + 1);
     setIsLiked(true);
 
-    // サーバーに送信
-    const response = await fetch(`/api/memos/${memoId}/like`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId }),
-    });
-    const data = await response.json();
+    try {
+      // サーバーに送信
+      const response = await fetch(`/api/memos/${memoId}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      const data = await response.json();
 
-    // サーバーの値で上書き
-    setCount(data.likes_count);
+      // サーバーの実際の値でカウントを同期
+      if (data.likes_count !== undefined) {
+        setCount(data.likes_count);
+      }
+    } catch {
+      // ネットワークエラー時は楽観的更新を巻き戻す
+      setCount((prev) => prev - 1);
+      setIsLiked(false);
+    }
+    // NOTE: isLoadingをリセットしない。
+    // いいねは1メモにつき1回限りなので、成功後にリセットする必要がない。
+    // 成功時はisLiked=trueでボタンがdisabledになるため問題ない。
   };
 
   return (

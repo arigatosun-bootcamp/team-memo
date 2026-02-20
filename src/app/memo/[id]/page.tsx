@@ -13,6 +13,20 @@ export default function MemoDetailPage() {
   const [memo, setMemo] = useState<Memo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [userId, setUserId] = useState<string | undefined>();
+  const [userName, setUserName] = useState<string | undefined>();
+
+  useEffect(() => {
+    async function checkUser() {
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        setUserName(user.user_metadata?.display_name || user.email || "ユーザー");
+      }
+    }
+    checkUser();
+  }, []);
 
   useEffect(() => {
     async function fetchMemo() {
@@ -77,7 +91,14 @@ export default function MemoDetailPage() {
   if (isLoading) {
     return (
       <>
-        <Header />
+        <Header
+        userName={userName}
+        onLogout={async () => {
+          const { supabase } = await import("@/lib/supabase");
+          await supabase.auth.signOut();
+          router.push("/login");
+        }}
+      />
         <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1.5rem" }}>
           <p style={{ color: "#a0a0b0" }}>読み込み中...</p>
         </main>
@@ -88,7 +109,14 @@ export default function MemoDetailPage() {
   if (!memo) {
     return (
       <>
-        <Header />
+        <Header
+        userName={userName}
+        onLogout={async () => {
+          const { supabase } = await import("@/lib/supabase");
+          await supabase.auth.signOut();
+          router.push("/login");
+        }}
+      />
         <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1.5rem" }}>
           <p style={{ color: "#a0a0b0" }}>メモが見つかりませんでした。</p>
         </main>
@@ -100,7 +128,14 @@ export default function MemoDetailPage() {
 
   return (
     <>
-      <Header />
+      <Header
+        userName={userName}
+        onLogout={async () => {
+          const { supabase } = await import("@/lib/supabase");
+          await supabase.auth.signOut();
+          router.push("/login");
+        }}
+      />
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1.5rem" }}>
         <button
           onClick={() => router.push("/")}
@@ -214,6 +249,7 @@ export default function MemoDetailPage() {
             <LikeButton
               memoId={memo.id}
               initialCount={memo.likes_count}
+              userId={userId}
             />
             <button
               onClick={handleSummarize}

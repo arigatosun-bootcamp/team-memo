@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import MemoCard from "@/components/MemoCard";
 import SearchBar from "@/components/SearchBar";
@@ -8,12 +9,25 @@ import Pagination from "@/components/Pagination";
 import type { Memo } from "@/lib/types";
 
 export default function Home() {
+  const router = useRouter();
   const [memos, setMemos] = useState<Memo[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState<string | undefined>();
+
+  useEffect(() => {
+    async function checkUser() {
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserName(user.user_metadata?.display_name || user.email || "ユーザー");
+      }
+    }
+    checkUser();
+  }, []);
 
   const fetchMemos = useCallback(async () => {
     setIsLoading(true);
@@ -52,7 +66,15 @@ export default function Home() {
 
   return (
     <>
-      <Header />
+      <Header
+        userName={userName}
+        onLogout={async () => {
+          const { supabase } = await import("@/lib/supabase");
+          await supabase.auth.signOut();
+          setUserName(undefined);
+          router.refresh();
+        }}
+      />
       <main
         style={{
           maxWidth: "1200px",
