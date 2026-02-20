@@ -16,6 +16,7 @@
 | 5 | ★★★★☆ | DELETE APIの認可バイパス（セキュリティバグ） | `api/memos/[id]/route.ts` | あり |
 | 6 | ★★★★★ | ページネーションのoff-by-one + ページ数計算の複合バグ | `api/memos/route.ts` + `Pagination.tsx` | あり |
 | 7 | (潜在) | いいねカウントの非アトミック更新（競合状態） | `api/memos/[id]/like/route.ts` | なし |
+| 8 | ★★★☆☆ | チャットボットのGemini APIキーに余分なスペース | `.env` + `api/chat/route.ts` | なし |
 
 ---
 
@@ -391,6 +392,64 @@ await supabase.from("memos").update({ likes_count: supabase.raw('likes_count + 1
 
 ---
 
+## Bug 8 (★★★☆☆): チャットボットのGemini APIキーに余分なスペース
+
+### 該当コード
+
+**`.env`**
+```env
+# Gemini AI（社内チャットボット用）
+GEMINI_API_KEY="AIzaSyBVD-XlNX5DWit1f_aA7ezyfLawgQhVd1c "
+```
+
+**`src/app/api/chat/route.ts`**
+```typescript
+const apiKey = process.env.GEMINI_API_KEY;
+// ...
+const response = await fetch(
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+  // ...
+);
+```
+
+### 何が間違っているか
+
+`.env` ファイルの `GEMINI_API_KEY` の値がダブルクォートで囲まれており、閉じクォートの直前に**末尾スペースが1つ**含まれている。
+
+dotenvはクォート内のスペースを値の一部として保持するため、`process.env.GEMINI_API_KEY` は `"AIzaSyBVD-XlNX5DWit1f_aA7ezyfLawgQhVd1c "` （末尾に半角スペース1つ）になる。
+
+このスペース入りAPIキーがGemini APIのURLに組み込まれ、`?key=AIzaSy...d1c ` とスペース付きでリクエストされるため、APIが `400 Bad Request` または `403 API key not valid` エラーを返す。
+
+### AIが見逃す理由
+
+- コードは完全に正しく書かれている（`process.env.GEMINI_API_KEY` をそのまま使用）
+- `.env` ファイルの末尾スペースは目視でほぼ見えない
+- ダブルクォートは他のenv値にも使われうる一般的な書き方で不自然ではない
+- エラーメッセージが「API key not valid」で、スペースの存在を直接示唆しない
+- AIがコードレビューしても`.env`ファイルの不可視スペースまでは通常チェックしない
+
+### 画面操作での検証手順
+
+1. 画面右下のチャットボタン（💬）をクリック
+2. チャットパネルが開く
+3. メッセージを入力して「送信」ボタンをクリック
+4. **「エラーが発生しました: API key not valid」** のようなエラーメッセージが表示される
+5. DevTools > Networkで `/api/chat` のレスポンスを確認 → 400/403エラー
+
+### 正しい修正
+
+`.env` ファイルのAPIキー値から末尾スペースを削除する（クォートごと削除しても可）:
+
+```env
+# 修正前（末尾にスペースあり）
+GEMINI_API_KEY="AIzaSyBVD-XlNX5DWit1f_aA7ezyfLawgQhVd1c "
+
+# 修正後
+GEMINI_API_KEY=AIzaSyBVD-XlNX5DWit1f_aA7ezyfLawgQhVd1c
+```
+
+---
+
 ## GitHub Issue テンプレート（研修生向け・曖昧に記述）
 
 研修生が見るIssue報告は意図的に曖昧にして、原因特定の訓練にする。
@@ -403,3 +462,4 @@ await supabase.from("memos").update({ likes_count: supabase.raw('likes_count + 1
 | 4 | ネットワークが不安定だといいねボタンが効かなくなる |
 | 5 | ログインしていないのに他人のメモが削除できる気がする |
 | 6 | メモが増えるとページ送りで同じメモが2回出たり、見られないメモがある |
+| 7 | 社内チャットボットにメッセージを送るとエラーになる |
