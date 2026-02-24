@@ -1,5 +1,13 @@
 #!/bin/bash
-# セッション開始時に自動でプロジェクト状態を表示するフック
+# セッション開始時に自動でプロジェクト状態を表示 + ログ記録するフック
+
+# ログ記録（起動するだけでログが残る）
+LOG_DIR=".claude/logs"
+mkdir -p "$LOG_DIR"
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+GIT_USER=$(git config user.name 2>/dev/null || echo "unknown")
+echo "[$TIMESTAMP] SESSION_START | user=$GIT_USER | branch=$BRANCH" >> "$LOG_DIR/session-$(date +%Y-%m-%d).log"
 
 echo "=========================================="
 echo "  Team Memo - セッション開始"
