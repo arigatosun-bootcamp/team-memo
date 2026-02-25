@@ -7,8 +7,10 @@ export type Memo = {
   is_private: boolean;
   summary: string | null;
   likes_count: number;
+  comments_count: number;
   created_at: string;
   updated_at: string;
+  tags?: Tag[];
 };
 
 export type Like = {
@@ -21,7 +23,55 @@ export type Like = {
 export type Profile = {
   id: string;
   display_name: string;
+  avatar_url: string | null;
+  role: "member" | "admin";
   created_at: string;
+};
+
+export type Comment = {
+  id: string;
+  memo_id: string;
+  user_id: string;
+  content: string;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+  user?: Profile;
+  replies?: Comment[];
+};
+
+// Bug 10: memo を Memo | null ではなく Memo として定義（RLSで非公開メモがnullになるケースを考慮していない）
+export type Bookmark = {
+  id: string;
+  user_id: string;
+  memo_id: string;
+  memo: Memo;
+  created_at: string;
+};
+
+export type Notification = {
+  id: string;
+  user_id: string;
+  type: "like" | "comment" | "mention" | "system";
+  title: string;
+  body: string | null;
+  memo_id: string | null;
+  actor_id: string | null;
+  is_read: boolean;
+  created_at: string;
+  actor?: Profile;
+};
+
+export type Tag = {
+  id: string;
+  name: string;
+  color: string;
+  created_at: string;
+};
+
+export type MemoTag = {
+  memo_id: string;
+  tag_id: string;
 };
 
 export type MemoListResponse = {
@@ -38,3 +88,10 @@ export const CATEGORIES: { value: Category; label: string }[] = [
   { value: "idea", label: "アイデア" },
   { value: "other", label: "その他" },
 ];
+
+export const NOTIFICATION_TYPES: Record<string, string> = {
+  like: "いいね",
+  comment: "コメント",
+  mention: "メンション",
+  system: "システム",
+};

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
 
 // いいね処理（重複チェックあり）
 export async function POST(
@@ -53,6 +54,23 @@ export async function POST(
     .from("memos")
     .update({ likes_count: newCount })
     .eq("id", memoId);
+
+  // Bug 11（部分）: 通知を作成。createNotification内でactorId === userIdチェックなし
+  const { data: memoData } = await supabase
+    .from("memos")
+    .select("user_id")
+    .eq("id", memoId)
+    .single();
+
+  if (memoData) {
+    await createNotification({
+      userId: memoData.user_id,
+      actorId: userId,
+      type: "like",
+      title: "メモにいいねが付きました",
+      memoId,
+    });
+  }
 
   return NextResponse.json({ likes_count: newCount });
 }

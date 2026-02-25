@@ -4,13 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import MemoForm from "@/components/MemoForm";
-import type { Category } from "@/lib/types";
+import TagInput from "@/components/TagInput";
+import type { Category, Tag } from "@/lib/types";
 
 export default function NewMemoPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | undefined>();
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   useEffect(() => {
     async function checkUser() {
@@ -39,6 +41,18 @@ export default function NewMemoPage() {
 
       if (response.ok) {
         const memo = await response.json();
+
+        // メモ作成後にタグを紐付け
+        if (selectedTags.length > 0) {
+          for (const tag of selectedTags) {
+            await fetch(`/api/memos/${memo.id}/tags`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tagId: tag.id }),
+            });
+          }
+        }
+
         router.push(`/memo/${memo.id}`);
       } else {
         const error = await response.json();
@@ -81,6 +95,16 @@ export default function NewMemoPage() {
         </h1>
 
         <MemoForm onSubmit={handleSubmit} isLoading={isLoading} submitLabel="作成" />
+
+        <div style={{ marginTop: "1rem" }}>
+          <label style={{ display: "block", marginBottom: "0.5rem", color: "#a0a0b0" }}>
+            タグ
+          </label>
+          <TagInput
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+          />
+        </div>
       </main>
     </>
   );

@@ -24,9 +24,32 @@ export default function MemoCard({ memo }: MemoCardProps) {
       {memo.summary && (
         <p className={styles.summary}>AI要約: {truncateText(memo.summary, 80)}</p>
       )}
+      {memo.tags && memo.tags.length > 0 && (
+        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", margin: "4px 0" }}>
+          {memo.tags.map((tag) => (
+            <span
+              key={tag.id}
+              style={{
+                fontSize: "11px",
+                padding: "1px 6px",
+                borderRadius: "8px",
+                backgroundColor: (tag.color || "#666") + "20",
+                color: tag.color || "#666",
+              }}
+            >
+              #{tag.name}
+            </span>
+          ))}
+        </div>
+      )}
       <div className={styles.footer}>
         <span className={styles.date}>{formatDate(memo.created_at)}</span>
-        <span className={styles.likes}>♥ {memo.likes_count}</span>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <span className={styles.likes}>♥ {memo.likes_count}</span>
+          {memo.comments_count > 0 && (
+            <span style={{ color: "#888", fontSize: "13px" }}>💬 {memo.comments_count}</span>
+          )}
+        </div>
       </div>
     </Link>
   );

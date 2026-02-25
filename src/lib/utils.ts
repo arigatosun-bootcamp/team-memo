@@ -57,3 +57,69 @@ export function sanitizeHtml(text: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+/**
+ * URLをサニタイズする（javascript:プロトコル等を除去）
+ */
+export function sanitizeUrl(url: string): string {
+  if (!url) return "";
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return url;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * 数値を表示用にフォーマットする（1000以上はK表記）
+ */
+export function formatCount(count: number): string {
+  if (count >= 1000) {
+    return (count / 1000).toFixed(1) + "K";
+  }
+  return String(count);
+}
+
+/**
+ * 日時を相対表示する（「3分前」「2時間前」「昨日」など）
+ */
+export function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMinutes < 1) return "たった今";
+  if (diffMinutes < 60) return `${diffMinutes}分前`;
+  if (diffHours < 24) return `${diffHours}時間前`;
+  if (diffDays < 7) return `${diffDays}日前`;
+  return formatDate(dateString);
+}
+
+/**
+ * タグ名を正規化する（小文字に変換）
+ */
+export function normalizeTag(tagName: string): string {
+  return tagName.trim().toLowerCase();
+}
+
+/**
+ * メモを日付ごとにグループ化する（統計用）
+ * Bug 13b: サーバーサイドではUTCタイムゾーンで日付が計算されるため、
+ * JSTの日付境界（0:00-8:59 JST = 前日UTC）でずれが発生する
+ */
+export function groupByDate(items: { created_at: string }[]): Record<string, number> {
+  const groups: Record<string, number> = {};
+  for (const item of items) {
+    // toLocaleDateString はサーバー（UTC）とクライアント（JST）で異なる結果を返す
+    const dateKey = new Date(item.created_at).toLocaleDateString("ja-JP");
+    groups[dateKey] = (groups[dateKey] || 0) + 1;
+  }
+  return groups;
+}

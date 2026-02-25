@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CATEGORIES } from "@/lib/types";
+import type { Tag } from "@/lib/types";
 
 type SearchBarProps = {
-  onSearch: (query: string, category: string) => void;
+  onSearch: (query: string, category: string, tag?: string) => void;
   initialQuery?: string;
   initialCategory?: string;
 };
@@ -16,10 +17,27 @@ export default function SearchBar({
 }: SearchBarProps) {
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
+  const [selectedTag, setSelectedTag] = useState("");
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await fetch("/api/tags");
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableTags(data.tags || []);
+        }
+      } catch {
+        // エラー時は何もしない
+      }
+    };
+    fetchTags();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(query, category);
+    onSearch(query, category, selectedTag || undefined);
   };
 
   return (
@@ -64,6 +82,27 @@ export default function SearchBar({
         {CATEGORIES.map((cat) => (
           <option key={cat.value} value={cat.value}>
             {cat.label}
+          </option>
+        ))}
+      </select>
+      <select
+        value={selectedTag}
+        onChange={(e) => setSelectedTag(e.target.value)}
+        style={{
+          padding: "0.625rem 1rem",
+          borderRadius: "6px",
+          border: "1px solid #2a2a4a",
+          backgroundColor: "#1a1a2e",
+          color: "#eee",
+          fontSize: "0.875rem",
+        }}
+      >
+        <option value="">すべてのタグ</option>
+        {/* Bug 14（部分）: タグ名をそのまま value に設定。
+            URLパラメータとして送信時に大文字小文字が区別される */}
+        {availableTags.map((tag) => (
+          <option key={tag.id} value={tag.name}>
+            #{tag.name}
           </option>
         ))}
       </select>

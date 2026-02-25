@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import LikeButton from "@/components/LikeButton";
+import BookmarkButton from "@/components/BookmarkButton";
+import CommentList from "@/components/CommentList";
+import TagBadge from "@/components/TagBadge";
 import { formatDateTime, getCategoryBadgeClass } from "@/lib/utils";
-import type { Memo } from "@/lib/types";
+import type { Memo, Comment, Tag } from "@/lib/types";
 
 export default function MemoDetailPage() {
   const params = useParams();
@@ -13,6 +16,8 @@ export default function MemoDetailPage() {
   const [memo, setMemo] = useState<Memo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [userId, setUserId] = useState<string | undefined>();
   const [userName, setUserName] = useState<string | undefined>();
 
@@ -41,7 +46,19 @@ export default function MemoDetailPage() {
         setIsLoading(false);
       }
     }
-    if (params.id) fetchMemo();
+    if (params.id) {
+      fetchMemo();
+      // コメントを取得
+      fetch(`/api/memos/${params.id}/comments`)
+        .then((res) => res.json())
+        .then((data) => setComments(data.comments || []))
+        .catch(() => {});
+      // タグを取得
+      fetch(`/api/memos/${params.id}/tags`)
+        .then((res) => res.json())
+        .then((data) => setTags(data.tags || []))
+        .catch(() => {});
+    }
   }, [params.id]);
 
   const handleDelete = async () => {
@@ -251,6 +268,7 @@ export default function MemoDetailPage() {
               initialCount={memo.likes_count}
               userId={userId}
             />
+            <BookmarkButton memoId={memo.id} userId={userId} />
             <button
               onClick={handleSummarize}
               disabled={isSummarizing}
@@ -282,6 +300,20 @@ export default function MemoDetailPage() {
               {memo.is_private ? "公開にする" : "非公開にする"}
             </button>
             <button
+              onClick={() => router.push(`/memo/${params.id}/edit`)}
+              style={{
+                padding: "0.5rem 1rem",
+                borderRadius: "20px",
+                border: "1px solid #38a169",
+                backgroundColor: "transparent",
+                color: "#38a169",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+              }}
+            >
+              編集
+            </button>
+            <button
               onClick={handleDelete}
               style={{
                 padding: "0.5rem 1rem",
@@ -297,6 +329,46 @@ export default function MemoDetailPage() {
               削除
             </button>
           </div>
+
+          {/* タグ表示 */}
+          {tags.length > 0 && (
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "16px" }}>
+              {tags.map((tag) => (
+                <TagBadge
+                  key={tag.id}
+                  name={tag.name}
+                  color={tag.color}
+                  onClick={() => router.push(`/tags/${tag.name}`)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* コメントセクション */}
+          <CommentList
+            memoId={memo.id}
+            comments={comments}
+            userId={userId}
+            onCommentAdded={(newComment) => {
+              if (newComment.parent_id) {
+                setComments((prev) =>
+                  prev.map((c) =>
+                    c.id === newComment.parent_id
+                      ? { ...c, replies: [...(c.replies || []), newComment] }
+                      : c
+                  )
+                );
+              } else {
+                setComments((prev) => [...prev, newComment]);
+              }
+              setMemo((prev) => prev ? { ...prev, comments_count: prev.comments_count + 1 } : null);
+            }}
+            onCommentDeleted={(commentId) => {
+              // Bug 9（部分）: 親コメントのみ除去。返信は残ったまま
+              setComments((prev) => prev.filter((c) => c.id !== commentId));
+              setMemo((prev) => prev ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) } : null);
+            }}
+          />
         </article>
       </main>
     </>

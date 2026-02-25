@@ -15,14 +15,17 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [searchTag, setSearchTag] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState<string | undefined>();
+  const [userId, setUserId] = useState<string | undefined>();
 
   useEffect(() => {
     async function checkUser() {
       const { supabase } = await import("@/lib/supabase");
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setUserId(user.id);
         setUserName(user.user_metadata?.display_name || user.email || "ユーザー");
       }
     }
@@ -36,6 +39,7 @@ export default function Home() {
     });
     if (searchQuery) params.set("search", searchQuery);
     if (searchCategory) params.set("category", searchCategory);
+    if (searchTag) params.set("tag", searchTag);
 
     try {
       const response = await fetch(`/api/memos?${params}`);
@@ -47,15 +51,16 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchQuery, searchCategory]);
+  }, [currentPage, searchQuery, searchCategory, searchTag]);
 
   useEffect(() => {
     fetchMemos();
   }, [fetchMemos]);
 
-  const handleSearch = (query: string, category: string) => {
+  const handleSearch = (query: string, category: string, tag?: string) => {
     setSearchQuery(query);
     setSearchCategory(category);
+    setSearchTag(tag || "");
     setCurrentPage(1);
   };
 
@@ -68,6 +73,7 @@ export default function Home() {
     <>
       <Header
         userName={userName}
+        userId={userId}
         onLogout={async () => {
           const { supabase } = await import("@/lib/supabase");
           await supabase.auth.signOut();
@@ -113,7 +119,7 @@ export default function Home() {
               color: "#a0a0b0",
             }}
           >
-            {searchQuery || searchCategory
+            {searchQuery || searchCategory || searchTag
               ? "検索条件に一致するメモがありません"
               : "メモがまだありません。最初のメモを作成しましょう！"}
           </div>

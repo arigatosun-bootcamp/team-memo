@@ -17,6 +17,13 @@
 | 6 | ★★★★★ | ページネーションのoff-by-one + ページ数計算の複合バグ | `api/memos/route.ts` + `Pagination.tsx` | あり |
 | 7 | (潜在) | いいねカウントの非アトミック更新（競合状態） | `api/memos/[id]/like/route.ts` | なし |
 | 8 | ★★★☆☆ | チャットボットのGemini APIキーの1文字typo（1→l） | `.env` | なし |
+| 9 | ★★★★☆ | コメント削除時のカスケードカウント不整合 | `api/comments/[commentId]/route.ts` + `CommentList.tsx` + `memo/[id]/page.tsx` | あり |
+| 10 | ★★★★★ | ブックマーク一覧で非公開メモがランタイムエラー | `api/bookmarks/route.ts` + `bookmarks/page.tsx` + `types.ts` + `BookmarkButton.tsx` | あり |
+| 11 | ★★★★☆ | 通知の自己通知 + NotificationBellのメモリリーク | `lib/notifications.ts` + `api/like/route.ts` + `api/comments/route.ts` + `NotificationBell.tsx` | あり |
+| 12 | ★★★★★ | プロフィール更新がHeaderと他画面で反映されない + XSS | `api/profile/route.ts` + `Header.tsx` + `UserAvatar.tsx` + `profile/page.tsx` | あり |
+| 13 | ★★★★★ | ランキングの非公開メモ混入 + 統計タイムゾーンずれ | `api/stats/ranking/route.ts` + `api/stats/route.ts` + `lib/utils.ts` + `dashboard/page.tsx` | あり |
+| 14 | ★★★★☆ | タグ検索の正規化不整合 + UNIQUE制約の500エラー | `api/tags/route.ts` + `TagInput.tsx` + `SearchBar.tsx` | あり |
+| 15 | ★★★★★ | 管理者APIのミドルウェアバイパス + role判定の論理エラー | `middleware.ts` + `lib/auth.ts` + `api/admin/users/route.ts` + `admin/page.tsx` | あり |
 
 ---
 
@@ -456,6 +463,413 @@ GEMINI_API_KEY=AIzaSyBVD-XlNX5DWit1f_aA7ezyfLawgQhVd1c
 
 ---
 
+## Bug 9 (★★★★☆): コメント削除時のカスケードカウント不整合
+
+### 該当コード（3ファイルにまたがる）
+
+**`src/app/api/memos/[id]/comments/[commentId]/route.ts`**
+```typescript
+// コメントを削除（DBのON DELETE CASCADEで子コメントも連鎖削除される）
+await supabase.from("comments").delete().eq("id", commentId);
+
+// comments_count を1つデクリメント
+// ★ バグ: CASCADEで子コメント(返信)も削除されるが、カウントは1しか減らない
+const newCount = Math.max(0, (memo?.comments_count || 0) - 1);
+```
+
+**`src/components/CommentList.tsx`**
+```typescript
+onCommentDeleted={(commentId) => {
+  // Bug 9（部分）: 親コメントのみ除去。返信は残ったまま
+  setComments((prev) => prev.filter((c) => c.id !== commentId));
+}
+```
+
+### 何が間違っているか
+
+1. **API側**: コメント削除時、DBの `ON DELETE CASCADE` で子コメント（返信）も連鎖削除されるが、`comments_count` は **1だけデクリメント**する
+   - 例: 親コメント1件 + 返信3件 → 親を削除 → DBでは4件消える → countは1しか減らない
+2. **フロント側**: `CommentList.tsx` は楽観的更新で親コメントのみUIから除去し、返信は残ったまま表示される
+
+### テストの誤誘導
+
+`src/__tests__/comments.test.ts` が `parent_id=null`（返信なし）のコメントのみでテストしており、CASCADEが発生するケースを検証していない。
+
+### 画面操作での検証手順
+
+1. メモ詳細ページでコメントを投稿
+2. そのコメントに返信を3件追加
+3. 親コメントを削除
+4. **期待**: 親コメント+返信3件が消え、comments_countが4減る
+5. **実際**: 返信がUI上に残り、comments_countが1しか減らない。ページリロードすると返信も消えるがカウントがずれている
+
+### 正しい修正
+
+```typescript
+// API側: 削除前に子孫コメント数を再帰的にカウント
+const { count } = await supabase
+  .from("comments")
+  .select("id", { count: "exact" })
+  .or(`id.eq.${commentId},parent_id.eq.${commentId}`);
+
+const deleteCount = count || 1;
+const newCount = Math.max(0, (memo?.comments_count || 0) - deleteCount);
+
+// フロント側: 親コメント削除時に返信もUIから除去
+setComments((prev) => prev.filter((c) => c.id !== commentId && c.parent_id !== commentId));
+```
+
+---
+
+## Bug 10 (★★★★★): ブックマーク一覧で非公開メモがランタイムエラー
+
+### 該当コード（4ファイルにまたがる）
+
+**`src/app/api/bookmarks/route.ts`**
+```typescript
+const { data } = await supabase
+  .from("bookmarks")
+  .select("*, memo:memos(*)")  // JOINで取得
+  // ★ RLSにより他ユーザーの非公開メモは memo: null になる
+```
+
+**`src/lib/types.ts`**
+```typescript
+export type Bookmark = {
+  // ...
+  memo: Memo;  // ★ null不許可で定義されている（実際はnullになり得る）
+};
+```
+
+**`src/app/bookmarks/page.tsx`**
+```typescript
+{bookmarks.map((bookmark) => (
+  <div key={bookmark.id}>
+    <h3>{bookmark.memo.title}</h3>  // ★ memo が null だとランタイムエラー
+  </div>
+))}
+```
+
+**`src/components/BookmarkButton.tsx`**
+```typescript
+useEffect(() => {
+  // ★ 依存配列に userId が欠けている
+  const checkBookmark = async () => { ... };
+  if (memoId) checkBookmark();
+}, [memoId]);  // eslint-disable-next-line react-hooks/exhaustive-deps
+```
+
+### 何が間違っているか
+
+1. **型定義**: `Bookmark` の `memo` フィールドが `Memo`（null不許可）だが、RLSにより `null` になり得る → `bookmark.memo.title` でランタイムエラー
+2. **BookmarkButton**: `useEffect` の依存配列に `userId` が欠けているため、userId変更時にブックマーク状態のチェックが再実行されない
+
+### テストの誤誘導
+
+`src/__tests__/bookmarks.test.ts` のモックデータで `memo` が常に存在するオブジェクトを返すため、nullアクセスのテストケースがない。
+
+### 画面操作での検証手順
+
+1. ユーザーAのメモをブックマーク
+2. ユーザーAがそのメモを非公開に変更
+3. ブックマーク一覧ページを開く → **白画面（ランタイムエラー）**
+4. DevToolsのコンソールに `Cannot read properties of null (reading 'title')` エラー
+
+### 正しい修正
+
+```typescript
+// types.ts
+memo: Memo | null;
+
+// bookmarks/page.tsx
+{bookmarks
+  .filter((b) => b.memo !== null)
+  .map((bookmark) => (
+    <div key={bookmark.id}>
+      <h3>{bookmark.memo!.title}</h3>
+    </div>
+  ))}
+
+// BookmarkButton.tsx
+}, [memoId, userId]);
+```
+
+---
+
+## Bug 11 (★★★★☆): 通知の自己通知 + NotificationBellのメモリリーク
+
+### 該当コード（4ファイルにまたがる）
+
+**`src/lib/notifications.ts`**
+```typescript
+export async function createNotification({ userId, actorId, ... }) {
+  // ★ userId === actorId のチェックがない
+  // → 自分のメモに自分でいいね/コメントすると自分に通知が来る
+  const { data } = await supabase.from("notifications").insert({ ... });
+}
+```
+
+**`src/components/NotificationBell.tsx`**
+```typescript
+// ★ fetchUnreadCount が useCallback で包まれていない
+const fetchUnreadCount = async () => { ... };
+
+useEffect(() => {
+  fetchUnreadCount();
+  const interval = setInterval(fetchUnreadCount, 5000);
+  return () => clearInterval(interval);
+}, [fetchUnreadCount]);  // ★ 毎回新しい関数参照 → 再レンダリングごとにインターバル再作成
+```
+
+### 何が間違っているか
+
+1. **通知生成**: `createNotification` に `userId !== actorId` ガードがないため、自分のメモに自分で操作すると自分に通知が来る
+2. **NotificationBell**: `fetchUnreadCount` が `useCallback` で安定化されていないため、依存配列 `[fetchUnreadCount]` が毎回変わり、`useEffect` が再実行されてインターバルが重複する（メモリリーク + 不要なAPI呼び出し）
+
+### テストの誤誘導
+
+`src/__tests__/notifications.test.ts` が `actorId` を別ユーザーにしたケースのみ検証し、自己通知ケースをテストしていない。
+
+### 画面操作での検証手順
+
+1. 自分が作成したメモにいいねを押す → 通知ベルに「メモにいいねが付きました」が表示される（自己通知）
+2. DevTools > Network でNotificationBellのポーリングリクエストが急速に増加していくのを確認（メモリリーク）
+
+### 正しい修正
+
+```typescript
+// notifications.ts
+if (userId === actorId) return null; // 自分への通知はスキップ
+
+// NotificationBell.tsx
+const fetchUnreadCount = useCallback(async () => { ... }, [userId]);
+```
+
+---
+
+## Bug 12 (★★★★★): プロフィール更新がHeaderと他画面で反映されない
+
+### 該当コード（5ファイルにまたがる）
+
+**`src/app/api/profile/route.ts`** (PUT)
+```typescript
+// profilesテーブルのみ更新
+const { data } = await supabase
+  .from("profiles")
+  .update({ display_name, avatar_url })
+  .eq("id", userId)
+  .select().single();
+// ★ auth.users の user_metadata は更新していない
+```
+
+**`src/components/Header.tsx`**
+```typescript
+// Header は supabase.auth.getUser() の user_metadata を参照
+setUserName(user.user_metadata?.display_name || user.email || "ユーザー");
+// ★ profiles テーブルではなく auth.users のメタデータを使用
+```
+
+**`src/components/UserAvatar.tsx`**
+```typescript
+// ★ sanitizeUrl() を呼んでいない → javascript: プロトコルのXSS脆弱性
+<img src={avatarUrl || "/default-avatar.png"} ... />
+```
+
+### 何が間違っているか
+
+1. **API**: プロフィール更新で `profiles` テーブルは更新するが `supabase.auth.updateUser({ data: { display_name, avatar_url } })` を呼んでいない。Headerは `auth.users` のメタデータを参照するため、古い名前が表示され続ける
+2. **XSS脆弱性**: `UserAvatar.tsx` で `avatar_url` に対する `sanitizeUrl()` 呼び出しがなく、`javascript:` プロトコルのURLを設定可能
+
+### テストの誤誘導
+
+`src/__tests__/profile.test.ts` が `profiles` テーブルの更新のみ検証し、`auth.users` のメタデータを検証しない。アバターURLも正常なHTTPSのURLのみテスト。
+
+### 画面操作での検証手順
+
+1. プロフィール画面で名前を変更して保存
+2. プロフィール画面では新しい名前が表示される（profilesテーブルから取得）
+3. ヘッダーを確認 → **古い名前のまま**（auth.usersから取得）
+4. ページをリロードしても変わらない
+5. avatar_urlに `javascript:alert('XSS')` を設定すると、アバター表示時にXSSが発動する
+
+### 正しい修正
+
+```typescript
+// profile/route.ts (PUT) に追加
+await supabase.auth.updateUser({
+  data: { display_name, avatar_url }
+});
+
+// UserAvatar.tsx
+import { sanitizeUrl } from "@/lib/utils";
+<img src={sanitizeUrl(avatarUrl) || "/default-avatar.png"} ... />
+```
+
+---
+
+## Bug 13 (★★★★★): ダッシュボードランキングの非公開メモ混入 + 統計タイムゾーンずれ
+
+### 該当コード（5ファイルにまたがる、2つの独立バグが1画面に共存）
+
+**Bug 13a: `src/app/api/stats/ranking/route.ts`**
+```typescript
+const { data } = await supabase
+  .from("memos")
+  .select("id, title, likes_count, comments_count, category, created_at")
+  .order("likes_count", { ascending: false })
+  .limit(10);
+// ★ is_private フィルタなし → 非公開メモがランキングに表示
+```
+
+**Bug 13b: `src/lib/utils.ts`**
+```typescript
+export function groupByDate(items: { created_at: string }[]): Record<string, number> {
+  const grouped: Record<string, number> = {};
+  for (const item of items) {
+    const date = new Date(item.created_at).toLocaleDateString("ja-JP");
+    // ★ サーバー(UTC)とクライアント(JST)で結果が異なる
+    grouped[date] = (grouped[date] || 0) + 1;
+  }
+  return grouped;
+}
+```
+
+### 何が間違っているか
+
+1. **Bug 13a**: ランキングAPIで `is_private` フィルタがなく、非公開メモがランキングに表示される。クリックして詳細に遷移するとRLSで弾かれ「メモが見つかりません」
+2. **Bug 13b**: `groupByDate()` が `toLocaleDateString` を使用するが、サーバー（UTC）とクライアント（JST）で結果が異なる。JST 00:30 → UTC 前日 15:30 となるケースで日跨ぎのずれが発生
+
+### テストの誤誘導
+
+- ランキングテストが `is_private` カラムを含まないモックデータ
+- 日付テストがUTC日中の時刻（06:00, 08:00等）のみでテスト（JST 15:00, 17:00に相当し、日跨ぎが発生しない）
+
+### 画面操作での検証手順
+
+1. 非公開のメモにいいねをたくさんつける
+2. ダッシュボードのランキングに非公開メモが表示される
+3. ランキングのメモをクリック → 「メモが見つかりません」
+4. 深夜0時〜9時にメモを作成し、ダッシュボードの日別グラフを確認 → 前日にカウントされている
+
+### 正しい修正
+
+```typescript
+// ranking/route.ts
+.eq("is_private", false)
+
+// utils.ts
+const date = new Date(item.created_at).toLocaleDateString("ja-JP", {
+  timeZone: "Asia/Tokyo"
+});
+```
+
+---
+
+## Bug 14 (★★★★☆): タグ検索の正規化不整合 + UNIQUE制約の500エラー
+
+### 該当コード（4ファイルにまたがる）
+
+**`src/components/TagInput.tsx`**
+```typescript
+// ★ 大文字小文字を区別して比較
+const filtered = allTags.filter(
+  (tag) => tag.name.includes(value.trim()) && ...
+);
+// 例: "React" で検索 → DB上の "react" は候補に表示されない
+```
+
+**`src/app/api/tags/route.ts`** (POST)
+```typescript
+const name = body.name.toLowerCase();  // 小文字に正規化して保存
+// ★ UNIQUE制約エラー(23505)を判別せず一律500を返す
+```
+
+### 何が間違っているか
+
+1. **TagInput**: オートコンプリートで `tag.name.includes(input)` が大文字小文字を区別するため、「React」と入力しても既存の「react」が候補に表示されない
+2. **タグAPI**: 候補に出ないので新規タグとしてPOSTすると、`toLowerCase()` で「react」に正規化 → DB UNIQUE制約違反 → 500エラー
+3. UNIQUE制約エラー(PostgreSQLエラーコード 23505)を判別せず、一律500を返すためユーザーにわかりにくいエラーメッセージ
+
+### テストの誤誘導
+
+`src/__tests__/tags.test.ts` が全て小文字のタグのみでテストしているため、大文字入力のケースが検証されない。
+
+### 画面操作での検証手順
+
+1. メモ新規作成画面でタグ入力欄に「React」と入力
+2. オートコンプリートに「react」が表示されない
+3. Enterキーで新規タグ作成 → **「タグの作成に失敗しました」**エラー
+4. DevToolsで `/api/tags` POST が500エラーを返していることを確認
+
+### 正しい修正
+
+```typescript
+// TagInput.tsx
+tag.name.toLowerCase().includes(value.trim().toLowerCase())
+
+// tags/route.ts (POST)
+if (error.code === "23505") {
+  const { data: existing } = await supabase
+    .from("tags").select("*").eq("name", name).single();
+  return NextResponse.json({ tag: existing }, { status: 200 });
+}
+```
+
+---
+
+## Bug 15 (★★★★★): 管理者APIのミドルウェアバイパス + role判定の論理エラー
+
+### 該当コード（4ファイルにまたがる、2層のセキュリティバグ）
+
+**Bug 15a: `src/middleware.ts`**
+```typescript
+export const config = {
+  matcher: ["/admin/:path*"],
+  // ★ /api/admin/:path* にマッチしない → APIは認可チェックなしで通る
+};
+```
+
+**Bug 15b: `src/lib/auth.ts`**
+```typescript
+export async function isAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from("profiles").select("role").eq("id", userId).single();
+  return data?.role === "admin" || data?.role === "owner";
+  // ★ "owner" ロールは profiles テーブルには存在しない
+  // profiles.role は "member" | "admin" のみ
+}
+```
+
+### 何が間違っているか
+
+1. **Bug 15a**: middleware の matcher が `/admin/:path*` のみで `/api/admin/:path*` にマッチしない。画面はブロックされるが、APIに直接リクエストすれば認可チェックなしでアクセスできる
+2. **Bug 15b**: `isAdmin()` が `"owner"` ロールを含めているが、profiles テーブルには `"owner"` ロールが存在しない。一見正しそうだが意味のない条件
+
+### テストの誤誘導
+
+- `src/__tests__/admin.test.ts` が `isAdmin()` を `role === "admin"` のケースだけ検証（"owner"ケースをテストしない）
+- ミドルウェアテストが画面パス（`/admin`、`/admin/users`）のマッチのみ確認し、APIパス（`/api/admin/users`）を検証しない
+
+### 画面操作での検証手順
+
+1. 一般ユーザーで `/admin` にアクセス → リダイレクトされる（ミドルウェアが機能）
+2. `curl` や DevTools で直接 `GET /api/admin/users` を叩く → **ユーザー一覧が返される**（認可バイパス）
+3. `DELETE /api/admin/users` で他ユーザーを削除できてしまう
+
+### 正しい修正
+
+```typescript
+// middleware.ts
+export const config = {
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
+};
+
+// auth.ts
+return data?.role === "admin";  // "owner" 条件を削除
+```
+
+---
+
 ## GitHub Issue テンプレート（研修生向け・曖昧に記述）
 
 研修生が見るIssue報告は意図的に曖昧にして、原因特定の訓練にする。
@@ -469,3 +883,10 @@ GEMINI_API_KEY=AIzaSyBVD-XlNX5DWit1f_aA7ezyfLawgQhVd1c
 | 5 | ログインしていないのに他人のメモが削除できる気がする |
 | 6 | メモが増えるとページ送りで同じメモが2回出たり、見られないメモがある |
 | 7 | 社内チャットボットにメッセージを送るとエラーが出て応答が返ってこない |
+| 8 | 返信付きコメントを削除すると数がおかしくなる |
+| 9 | ブックマーク一覧を開くと画面が真っ白になることがある |
+| 10 | 自分のメモにいいねしたら自分に通知が来る + 通知ベルがおかしい |
+| 11 | プロフィール画面で名前を変えてもヘッダーの表示が古いまま |
+| 12 | ダッシュボードのランキングに見られないメモが表示される + 日付グラフがずれる |
+| 13 | タグ入力で大文字を使うとエラーになる |
+| 14 | 管理者画面にアクセスできないはずのユーザーがAPIを直接叩ける |
