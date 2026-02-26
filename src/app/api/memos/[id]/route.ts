@@ -30,19 +30,13 @@ export async function PUT(
   const body = await request.json();
   const { title, content, category } = body;
 
-  // 日本時間(JST)で統一して保存することで、表示時のタイムゾーン変換を簡素化する
-  // Supabaseのtimestamptz型はISO 8601形式のZ(UTC)表記を正しく解釈する
-  const now = new Date();
-  const JST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9（日本標準時）
-  const jstNow = new Date(now.getTime() + JST_OFFSET_MS);
-
   const { data, error } = await supabase
     .from("memos")
     .update({
       title,
       content,
       category,
-      updated_at: jstNow.toISOString(),
+      updated_at: new Date().toISOString(),
     })
     .eq("id", id)
     .select()
