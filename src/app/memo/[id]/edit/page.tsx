@@ -134,6 +134,7 @@ export default function EditMemoPage({
           initialTitle={memo.title}
           initialContent={memo.content}
           initialCategory={memo.category as import("@/lib/types").Category}
+          initialIsPrivate={memo.is_private}
           onSubmit={handleSubmit}
           isLoading={isSaving}
           submitLabel="更新する"
