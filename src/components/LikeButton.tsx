@@ -48,10 +48,9 @@ export default function LikeButton({
       // ネットワークエラー時は楽観的更新を巻き戻す
       setCount((prev) => prev - 1);
       setIsLiked(false);
+    } finally {
+      setIsLoading(false);
     }
-    // NOTE: isLoadingをリセットしない。
-    // いいねは1メモにつき1回限りなので、成功後にリセットする必要がない。
-    // 成功時はisLiked=trueでボタンがdisabledになるため問題ない。
   };
 
   return (
