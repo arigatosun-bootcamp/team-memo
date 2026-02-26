@@ -66,11 +66,11 @@ export default function LoginPage() {
         {error && (
           <div
             style={{
-              backgroundColor: "#3a1a1a",
-              border: "1px solid #e94560",
+              backgroundColor: "#fef2f2",
+              border: "1px solid #2563eb",
               borderRadius: "6px",
               padding: "0.75rem 1rem",
-              color: "#e94560",
+              color: "#2563eb",
               fontSize: "0.875rem",
               marginBottom: "1.5rem",
             }}
@@ -89,7 +89,7 @@ export default function LoginPage() {
               style={{
                 display: "block",
                 marginBottom: "0.5rem",
-                color: "#a0a0b0",
+                color: "#64748b",
                 fontSize: "0.875rem",
               }}
             >
@@ -106,9 +106,9 @@ export default function LoginPage() {
                 width: "100%",
                 padding: "0.75rem",
                 borderRadius: "6px",
-                border: "1px solid #2a2a4a",
-                backgroundColor: "#1a1a2e",
-                color: "#eee",
+                border: "1px solid #e2e8f0",
+                backgroundColor: "#f1f5f9",
+                color: "#1e293b",
                 fontSize: "1rem",
               }}
             />
@@ -120,7 +120,7 @@ export default function LoginPage() {
               style={{
                 display: "block",
                 marginBottom: "0.5rem",
-                color: "#a0a0b0",
+                color: "#64748b",
                 fontSize: "0.875rem",
               }}
             >
@@ -138,9 +138,9 @@ export default function LoginPage() {
                 width: "100%",
                 padding: "0.75rem",
                 borderRadius: "6px",
-                border: "1px solid #2a2a4a",
-                backgroundColor: "#1a1a2e",
-                color: "#eee",
+                border: "1px solid #e2e8f0",
+                backgroundColor: "#f1f5f9",
+                color: "#1e293b",
                 fontSize: "1rem",
               }}
             />
@@ -153,7 +153,7 @@ export default function LoginPage() {
               padding: "0.75rem",
               borderRadius: "6px",
               border: "none",
-              backgroundColor: "#e94560",
+              backgroundColor: "#2563eb",
               color: "white",
               fontSize: "1rem",
               fontWeight: 600,
@@ -174,7 +174,7 @@ export default function LoginPage() {
           style={{
             textAlign: "center",
             marginTop: "1.5rem",
-            color: "#a0a0b0",
+            color: "#64748b",
             fontSize: "0.875rem",
           }}
         >
@@ -184,7 +184,7 @@ export default function LoginPage() {
             style={{
               background: "none",
               border: "none",
-              color: "#e94560",
+              color: "#2563eb",
               cursor: "pointer",
               fontSize: "0.875rem",
               marginLeft: "0.25rem",

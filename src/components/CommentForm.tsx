@@ -59,9 +59,11 @@ export default function CommentForm({
         style={{
           flex: 1,
           padding: "8px 12px",
-          border: "1px solid #ddd",
+          border: "1px solid #e2e8f0",
           borderRadius: "6px",
           fontSize: "14px",
+          backgroundColor: "#f1f5f9",
+          color: "#1e293b",
         }}
       />
       <button
@@ -69,7 +71,7 @@ export default function CommentForm({
         disabled={isSubmitting || !content.trim()}
         style={{
           padding: "8px 16px",
-          backgroundColor: isSubmitting ? "#ccc" : "#4299e1",
+          backgroundColor: isSubmitting ? "#1e293b" : "#2563eb",
           color: "white",
           border: "none",
           borderRadius: "6px",

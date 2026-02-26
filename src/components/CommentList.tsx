@@ -44,19 +44,21 @@ export default function CommentList({
       style={{
         marginLeft: isReply ? "32px" : "0",
         padding: "12px",
-        borderBottom: "1px solid #eee",
-        backgroundColor: isReply ? "#f9f9f9" : "white",
+        borderBottom: "1px solid #e2e8f0",
+        backgroundColor: isReply ? "#f1f5f9" : "#f8fafc",
+        borderRadius: "6px",
+        marginBottom: "4px",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-        <span style={{ fontWeight: "bold", fontSize: "14px" }}>
+        <span style={{ fontWeight: "bold", fontSize: "14px", color: "#1e293b" }}>
           {comment.user?.display_name || "不明なユーザー"}
         </span>
-        <span style={{ color: "#888", fontSize: "12px" }}>
+        <span style={{ color: "#64748b", fontSize: "12px" }}>
           {formatRelativeTime(comment.created_at)}
         </span>
       </div>
-      <p style={{ margin: "4px 0 8px", fontSize: "14px", lineHeight: "1.5" }}>
+      <p style={{ margin: "4px 0 8px", fontSize: "14px", lineHeight: "1.5", color: "#475569" }}>
         {comment.content}
       </p>
       <div style={{ display: "flex", gap: "12px" }}>
@@ -66,7 +68,7 @@ export default function CommentList({
             style={{
               background: "none",
               border: "none",
-              color: "#666",
+              color: "#64748b",
               cursor: "pointer",
               fontSize: "12px",
               padding: 0,
@@ -81,7 +83,7 @@ export default function CommentList({
             style={{
               background: "none",
               border: "none",
-              color: "#e53e3e",
+              color: "#dc2626",
               cursor: "pointer",
               fontSize: "12px",
               padding: 0,
@@ -124,7 +126,7 @@ export default function CommentList({
       )}
       <div style={{ marginTop: "16px" }}>
         {comments.length === 0 ? (
-          <p style={{ color: "#888", textAlign: "center", padding: "24px" }}>
+          <p style={{ color: "#94a3b8", textAlign: "center", padding: "24px" }}>
             まだコメントはありません
           </p>
         ) : (

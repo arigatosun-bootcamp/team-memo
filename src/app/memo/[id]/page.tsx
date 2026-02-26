@@ -117,7 +117,7 @@ export default function MemoDetailPage() {
         }}
       />
         <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1.5rem" }}>
-          <p style={{ color: "#a0a0b0" }}>読み込み中...</p>
+          <p style={{ color: "#64748b" }}>読み込み中...</p>
         </main>
       </>
     );
@@ -135,7 +135,7 @@ export default function MemoDetailPage() {
         }}
       />
         <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1.5rem" }}>
-          <p style={{ color: "#a0a0b0" }}>メモが見つかりませんでした。</p>
+          <p style={{ color: "#64748b" }}>メモが見つかりませんでした。</p>
         </main>
       </>
     );
@@ -159,7 +159,7 @@ export default function MemoDetailPage() {
           style={{
             background: "none",
             border: "none",
-            color: "#a0a0b0",
+            color: "#64748b",
             cursor: "pointer",
             marginBottom: "1.5rem",
             fontSize: "0.875rem",
@@ -187,20 +187,20 @@ export default function MemoDetailPage() {
                 borderRadius: "12px",
                 backgroundColor:
                   badgeClass === "badgeInfo"
-                    ? "#1a3a5c"
+                    ? "#eff6ff"
                     : badgeClass === "badgeWarning"
-                      ? "#4a3a1a"
+                      ? "#fffbeb"
                       : badgeClass === "badgeSuccess"
-                        ? "#1a4a3a"
-                        : "#2a2a4a",
+                        ? "#f0fdf4"
+                        : "#e2e8f0",
                 color:
                   badgeClass === "badgeInfo"
-                    ? "#5dade2"
+                    ? "#2563eb"
                     : badgeClass === "badgeWarning"
-                      ? "#f39c12"
+                      ? "#d97706"
                       : badgeClass === "badgeSuccess"
-                        ? "#2ecc71"
-                        : "#a0a0b0",
+                        ? "#16a34a"
+                        : "#64748b",
               }}
             >
               {memo.category}
@@ -211,7 +211,7 @@ export default function MemoDetailPage() {
             style={{
               display: "flex",
               gap: "1rem",
-              color: "#666",
+              color: "#94a3b8",
               fontSize: "0.8125rem",
               marginBottom: "1.5rem",
             }}
@@ -223,13 +223,13 @@ export default function MemoDetailPage() {
 
           <div
             style={{
-              backgroundColor: "#16213e",
+              backgroundColor: "#f8fafc",
               borderRadius: "8px",
               padding: "1.5rem",
               marginBottom: "1.5rem",
               lineHeight: 1.8,
               whiteSpace: "pre-wrap",
-              color: "#ccc",
+              color: "#475569",
             }}
           >
             {memo.content}
@@ -238,17 +238,17 @@ export default function MemoDetailPage() {
           {memo.summary && (
             <div
               style={{
-                backgroundColor: "#1a1a3e",
-                border: "1px solid #7b68ee33",
+                backgroundColor: "#f1f5f9",
+                border: "1px solid #7c3aed1a",
                 borderRadius: "8px",
                 padding: "1rem 1.5rem",
                 marginBottom: "1.5rem",
               }}
             >
-              <h3 style={{ color: "#7b68ee", fontSize: "0.875rem", marginBottom: "0.5rem" }}>
+              <h3 style={{ color: "#7c3aed", fontSize: "0.875rem", marginBottom: "0.5rem" }}>
                 AI要約
               </h3>
-              <p style={{ color: "#a0a0b0", fontSize: "0.875rem", lineHeight: 1.6 }}>
+              <p style={{ color: "#64748b", fontSize: "0.875rem", lineHeight: 1.6 }}>
                 {memo.summary}
               </p>
             </div>
@@ -260,7 +260,7 @@ export default function MemoDetailPage() {
               alignItems: "center",
               gap: "1rem",
               paddingTop: "1rem",
-              borderTop: "1px solid #2a2a4a",
+              borderTop: "1px solid #e2e8f0",
             }}
           >
             <LikeButton
@@ -275,9 +275,9 @@ export default function MemoDetailPage() {
               style={{
                 padding: "0.5rem 1rem",
                 borderRadius: "20px",
-                border: "1px solid #7b68ee",
+                border: "1px solid #7c3aed",
                 backgroundColor: "transparent",
-                color: "#7b68ee",
+                color: "#7c3aed",
                 cursor: isSummarizing ? "not-allowed" : "pointer",
                 fontSize: "0.875rem",
                 opacity: isSummarizing ? 0.6 : 1,
@@ -290,9 +290,9 @@ export default function MemoDetailPage() {
               style={{
                 padding: "0.5rem 1rem",
                 borderRadius: "20px",
-                border: "1px solid #2a2a4a",
+                border: "1px solid #e2e8f0",
                 backgroundColor: "transparent",
-                color: "#a0a0b0",
+                color: "#64748b",
                 cursor: "pointer",
                 fontSize: "0.875rem",
               }}
@@ -306,7 +306,7 @@ export default function MemoDetailPage() {
                 borderRadius: "20px",
                 border: "1px solid #38a169",
                 backgroundColor: "transparent",
-                color: "#38a169",
+                color: "#16a34a",
                 cursor: "pointer",
                 fontSize: "0.875rem",
               }}
@@ -318,9 +318,9 @@ export default function MemoDetailPage() {
               style={{
                 padding: "0.5rem 1rem",
                 borderRadius: "20px",
-                border: "1px solid #e94560",
+                border: "1px solid #2563eb",
                 backgroundColor: "transparent",
-                color: "#e94560",
+                color: "#2563eb",
                 cursor: "pointer",
                 fontSize: "0.875rem",
                 marginLeft: "auto",

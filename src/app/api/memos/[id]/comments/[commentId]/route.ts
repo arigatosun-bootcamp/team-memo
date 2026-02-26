@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 // DELETE: コメントを削除
 // Bug 9: 親コメント削除時に子コメント(返信)もDBのCASCADEで連鎖削除されるが、

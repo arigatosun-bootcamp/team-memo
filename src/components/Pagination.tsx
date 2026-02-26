@@ -34,9 +34,9 @@ export default function Pagination({
         style={{
           padding: "0.5rem 1rem",
           borderRadius: "4px",
-          border: "1px solid #2a2a4a",
-          backgroundColor: currentPage === 1 ? "#1a1a2e" : "#16213e",
-          color: currentPage === 1 ? "#555" : "#a0a0b0",
+          border: "1px solid #e2e8f0",
+          backgroundColor: currentPage === 1 ? "#f1f5f9" : "#f8fafc",
+          color: currentPage === 1 ? "#555" : "#64748b",
           cursor: currentPage === 1 ? "not-allowed" : "pointer",
         }}
       >
@@ -52,10 +52,10 @@ export default function Pagination({
             borderRadius: "4px",
             border:
               page === currentPage
-                ? "1px solid #e94560"
-                : "1px solid #2a2a4a",
-            backgroundColor: page === currentPage ? "#e94560" : "#16213e",
-            color: page === currentPage ? "white" : "#a0a0b0",
+                ? "1px solid #2563eb"
+                : "1px solid #e2e8f0",
+            backgroundColor: page === currentPage ? "#2563eb" : "#f8fafc",
+            color: page === currentPage ? "white" : "#64748b",
             cursor: page === currentPage ? "default" : "pointer",
             fontWeight: page === currentPage ? 600 : 400,
           }}
@@ -69,10 +69,10 @@ export default function Pagination({
         style={{
           padding: "0.5rem 1rem",
           borderRadius: "4px",
-          border: "1px solid #2a2a4a",
+          border: "1px solid #e2e8f0",
           backgroundColor:
-            currentPage === totalPages ? "#1a1a2e" : "#16213e",
-          color: currentPage === totalPages ? "#555" : "#a0a0b0",
+            currentPage === totalPages ? "#f1f5f9" : "#f8fafc",
+          color: currentPage === totalPages ? "#555" : "#64748b",
           cursor: currentPage === totalPages ? "not-allowed" : "pointer",
         }}
       >

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 import type { Memo } from "@/lib/types";
 
 // メモ一覧を最新順で取得
@@ -51,6 +51,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "タイトルと本文は必須です" },
       { status: 400 }
+    );
+  }
+
+  if (!user_id) {
+    return NextResponse.json(
+      { error: "ログインが必要です" },
+      { status: 401 }
     );
   }
 

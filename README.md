@@ -23,6 +23,13 @@
 - **テスト**: Vitest + Testing Library
 - **リント**: ESLint
 
+## テストアカウント
+
+| ユーザー | メールアドレス | パスワード | ロール |
+|---------|---------------|-----------|--------|
+| テストユーザー1 | `testuser@example.com` | `Test1234!` | admin |
+| テストユーザー2（田中太郎） | `testuser2@example.com` | `Test1234!` | member |
+
 ## セットアップ
 
 ```bash

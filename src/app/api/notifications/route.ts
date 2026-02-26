@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 // GET: ユーザーの通知一覧を取得
 export async function GET(request: NextRequest) {
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("notifications")
-    .select("*, actor:profiles!actor_id(display_name, avatar_url)")
+    .select("*, actor:profiles!notifications_actor_id_profiles_fkey(display_name, avatar_url)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);

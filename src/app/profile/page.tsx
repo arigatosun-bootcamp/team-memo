@@ -88,7 +88,7 @@ export default function ProfilePage() {
           プロフィール設定
         </h1>
         {isLoading ? (
-          <p style={{ textAlign: "center", color: "#888" }}>読み込み中...</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>読み込み中...</p>
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
@@ -99,7 +99,7 @@ export default function ProfilePage() {
               />
               <div>
                 <p style={{ fontWeight: "bold" }}>{profile?.display_name}</p>
-                <p style={{ fontSize: "13px", color: "#888" }}>
+                <p style={{ fontSize: "13px", color: "#94a3b8" }}>
                   ロール: {profile?.role === "admin" ? "管理者" : "メンバー"}
                 </p>
               </div>
@@ -139,7 +139,7 @@ export default function ProfilePage() {
                   fontSize: "14px",
                 }}
               />
-              <p style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+              <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
                 画像URLを入力してください（任意）
               </p>
             </div>
@@ -149,7 +149,7 @@ export default function ProfilePage() {
                 borderRadius: "6px",
                 marginBottom: "16px",
                 backgroundColor: message.includes("失敗") ? "#fff5f5" : "#f0fff4",
-                color: message.includes("失敗") ? "#e53e3e" : "#38a169",
+                color: message.includes("失敗") ? "#dc2626" : "#16a34a",
                 fontSize: "14px",
               }}>
                 {message}
@@ -160,7 +160,7 @@ export default function ProfilePage() {
               disabled={isSaving}
               style={{
                 padding: "10px 24px",
-                backgroundColor: isSaving ? "#ccc" : "#4299e1",
+                backgroundColor: isSaving ? "#ccc" : "#2563eb",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",

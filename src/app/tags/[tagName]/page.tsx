@@ -49,9 +49,9 @@ export default function TagMemosPage({
           タグ: #{decodeURIComponent(tagName)}
         </h1>
         {isLoading ? (
-          <p style={{ textAlign: "center", color: "#888" }}>読み込み中...</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>読み込み中...</p>
         ) : memos.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888", padding: "48px" }}>
+          <p style={{ textAlign: "center", color: "#94a3b8", padding: "48px" }}>
             このタグのメモはありません
           </p>
         ) : (

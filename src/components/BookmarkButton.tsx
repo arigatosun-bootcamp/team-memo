@@ -79,7 +79,7 @@ export default function BookmarkButton({ memoId, userId }: BookmarkButtonProps) 
         padding: "6px 12px",
         cursor: isLoading ? "not-allowed" : "pointer",
         fontSize: "16px",
-        color: isBookmarked ? "#eab308" : "#888",
+        color: isBookmarked ? "#eab308" : "#94a3b8",
         display: "flex",
         alignItems: "center",
         gap: "4px",

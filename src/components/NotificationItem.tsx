@@ -28,8 +28,8 @@ export default function NotificationItem({
     <div
       style={{
         padding: "12px 16px",
-        borderBottom: "1px solid #f0f0f0",
-        backgroundColor: notification.is_read ? "white" : "#f0f7ff",
+        borderBottom: "1px solid #e2e8f0",
+        backgroundColor: notification.is_read ? "#f8fafc" : "#eff6ff",
         display: "flex",
         alignItems: "flex-start",
         gap: "12px",
@@ -41,23 +41,23 @@ export default function NotificationItem({
           <span
             style={{
               fontSize: "11px",
-              color: "#888",
-              backgroundColor: "#f0f0f0",
+              color: "#64748b",
+              backgroundColor: "#e2e8f0",
               padding: "2px 6px",
               borderRadius: "4px",
             }}
           >
             {typeLabel}
           </span>
-          <span style={{ color: "#888", fontSize: "12px" }}>
+          <span style={{ color: "#64748b", fontSize: "12px" }}>
             {formatRelativeTime(notification.created_at)}
           </span>
         </div>
-        <p style={{ margin: "4px 0 2px", fontSize: "14px", fontWeight: notification.is_read ? "normal" : "bold" }}>
+        <p style={{ margin: "4px 0 2px", fontSize: "14px", fontWeight: notification.is_read ? "normal" : "bold", color: "#1e293b" }}>
           {notification.title}
         </p>
         {notification.body && (
-          <p style={{ margin: 0, fontSize: "13px", color: "#666" }}>
+          <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
             {notification.body}
           </p>
         )}
@@ -65,7 +65,7 @@ export default function NotificationItem({
           {notification.memo_id && (
             <Link
               href={`/memo/${notification.memo_id}`}
-              style={{ fontSize: "12px", color: "#4299e1", textDecoration: "none" }}
+              style={{ fontSize: "12px", color: "#2563eb", textDecoration: "none" }}
             >
               メモを見る
             </Link>
@@ -76,7 +76,7 @@ export default function NotificationItem({
               style={{
                 background: "none",
                 border: "none",
-                color: "#888",
+                color: "#64748b",
                 cursor: "pointer",
                 fontSize: "12px",
                 padding: 0,

@@ -50,9 +50,9 @@ export default function BookmarksPage() {
           ブックマーク
         </h1>
         {isLoading ? (
-          <p style={{ textAlign: "center", color: "#888" }}>読み込み中...</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>読み込み中...</p>
         ) : bookmarks.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888", padding: "48px" }}>
+          <p style={{ textAlign: "center", color: "#94a3b8", padding: "48px" }}>
             ブックマークしたメモはありません
           </p>
         ) : (
@@ -77,10 +77,10 @@ export default function BookmarksPage() {
                   <h3 style={{ fontSize: "16px", fontWeight: "bold", margin: "0 0 4px" }}>
                     {bookmark.memo.title}
                   </h3>
-                  <p style={{ fontSize: "13px", color: "#666", margin: "0 0 4px" }}>
+                  <p style={{ fontSize: "13px", color: "#94a3b8", margin: "0 0 4px" }}>
                     {truncateText(bookmark.memo.content, 100)}
                   </p>
-                  <span style={{ fontSize: "12px", color: "#888" }}>
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
                     {formatDate(bookmark.created_at)}
                   </span>
                 </Link>

@@ -106,7 +106,7 @@ export default function Home() {
             style={{
               textAlign: "center",
               padding: "3rem",
-              color: "#a0a0b0",
+              color: "#64748b",
             }}
           >
             読み込み中...
@@ -116,7 +116,7 @@ export default function Home() {
             style={{
               textAlign: "center",
               padding: "3rem",
-              color: "#a0a0b0",
+              color: "#64748b",
             }}
           >
             {searchQuery || searchCategory || searchTag

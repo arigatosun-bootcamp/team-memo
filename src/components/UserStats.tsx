@@ -17,19 +17,19 @@ export default function UserStats({
         <div style={{ fontSize: "24px", fontWeight: "bold", color: "#2d3748" }}>
           {formatCount(memoCount)}
         </div>
-        <div style={{ fontSize: "13px", color: "#888" }}>メモ</div>
+        <div style={{ fontSize: "13px", color: "#94a3b8" }}>メモ</div>
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: "24px", fontWeight: "bold", color: "#e53e3e" }}>
+        <div style={{ fontSize: "24px", fontWeight: "bold", color: "#dc2626" }}>
           {formatCount(totalLikes)}
         </div>
-        <div style={{ fontSize: "13px", color: "#888" }}>いいね</div>
+        <div style={{ fontSize: "13px", color: "#94a3b8" }}>いいね</div>
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: "24px", fontWeight: "bold", color: "#4299e1" }}>
+        <div style={{ fontSize: "24px", fontWeight: "bold", color: "#2563eb" }}>
           {formatCount(commentCount)}
         </div>
-        <div style={{ fontSize: "13px", color: "#888" }}>コメント</div>
+        <div style={{ fontSize: "13px", color: "#94a3b8" }}>コメント</div>
       </div>
     </div>
   );

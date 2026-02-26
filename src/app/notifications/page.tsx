@@ -82,14 +82,14 @@ export default function NotificationsPage() {
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>
-            通知 {unreadCount > 0 && <span style={{ color: "#e53e3e", fontSize: "16px" }}>({unreadCount}件の未読)</span>}
+            通知 {unreadCount > 0 && <span style={{ color: "#dc2626", fontSize: "16px" }}>({unreadCount}件の未読)</span>}
           </h1>
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
               style={{
                 padding: "8px 16px",
-                backgroundColor: "#4299e1",
+                backgroundColor: "#2563eb",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
@@ -102,9 +102,9 @@ export default function NotificationsPage() {
           )}
         </div>
         {isLoading ? (
-          <p style={{ textAlign: "center", color: "#888" }}>読み込み中...</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>読み込み中...</p>
         ) : notifications.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888", padding: "48px" }}>
+          <p style={{ textAlign: "center", color: "#94a3b8", padding: "48px" }}>
             通知はありません
           </p>
         ) : (

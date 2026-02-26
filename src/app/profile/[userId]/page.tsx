@@ -59,9 +59,9 @@ export default function UserProfilePage({
       <Header userName={userName} onLogout={handleLogout} />
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "24px" }}>
         {isLoading ? (
-          <p style={{ textAlign: "center", color: "#888" }}>読み込み中...</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>読み込み中...</p>
         ) : !profile ? (
-          <p style={{ textAlign: "center", color: "#888" }}>ユーザーが見つかりません</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>ユーザーが見つかりません</p>
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
@@ -86,7 +86,7 @@ export default function UserProfilePage({
               公開メモ
             </h2>
             {memos.length === 0 ? (
-              <p style={{ color: "#888", textAlign: "center", padding: "24px" }}>
+              <p style={{ color: "#94a3b8", textAlign: "center", padding: "24px" }}>
                 公開メモはありません
               </p>
             ) : (

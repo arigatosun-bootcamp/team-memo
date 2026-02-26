@@ -1,16 +1,17 @@
 .card {
-  background-color: #16213e;
-  border: 1px solid #1a1a2e;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1.25rem;
   text-decoration: none;
   color: inherit;
   display: block;
-  transition: border-color 0.2s, transform 0.1s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 .card:hover {
-  border-color: #e94560;
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
   transform: translateY(-1px);
 }
 
@@ -24,7 +25,7 @@
 .title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #eee;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -36,39 +37,39 @@
 }
 
 .badgeDefault {
-  background-color: #2a2a4a;
-  color: #a0a0b0;
+  background-color: #f1f5f9;
+  color: #64748b;
 }
 
 .badgeInfo {
-  background-color: #1a3a5c;
-  color: #5dade2;
+  background-color: #eff6ff;
+  color: #2563eb;
 }
 
 .badgeWarning {
-  background-color: #4a3a1a;
-  color: #f39c12;
+  background-color: #fffbeb;
+  color: #d97706;
 }
 
 .badgeSuccess {
-  background-color: #1a4a3a;
-  color: #2ecc71;
+  background-color: #f0fdf4;
+  color: #16a34a;
 }
 
 .content {
-  color: #a0a0b0;
+  color: #64748b;
   font-size: 0.875rem;
   line-height: 1.5;
   margin: 0 0 0.5rem;
 }
 
 .summary {
-  color: #7b68ee;
+  color: #7c3aed;
   font-size: 0.8125rem;
   font-style: italic;
   margin: 0 0 0.75rem;
   padding: 0.5rem;
-  background-color: #1a1a2e;
+  background-color: #faf5ff;
   border-radius: 4px;
 }
 
@@ -77,16 +78,16 @@
   align-items: center;
   justify-content: space-between;
   padding-top: 0.75rem;
-  border-top: 1px solid #1a1a2e;
+  border-top: 1px solid #f1f5f9;
 }
 
 .date {
-  color: #666;
+  color: #94a3b8;
   font-size: 0.8125rem;
 }
 
 .likes {
-  color: #e94560;
+  color: #dc2626;
   font-size: 0.875rem;
   font-weight: 500;
 }

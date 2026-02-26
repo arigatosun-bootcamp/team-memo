@@ -53,8 +53,8 @@ export default function MemoRanking({ type = "likes", limit = 10 }: MemoRankingP
               padding: "6px 12px",
               borderRadius: "16px",
               border: "1px solid #ddd",
-              backgroundColor: selectedType === t ? "#4299e1" : "white",
-              color: selectedType === t ? "white" : "#333",
+              backgroundColor: selectedType === t ? "#2563eb" : "white",
+              color: selectedType === t ? "white" : "#1e293b",
               cursor: "pointer",
               fontSize: "13px",
             }}
@@ -64,11 +64,11 @@ export default function MemoRanking({ type = "likes", limit = 10 }: MemoRankingP
         ))}
       </div>
       {isLoading ? (
-        <p style={{ textAlign: "center", color: "#888", padding: "24px" }}>
+        <p style={{ textAlign: "center", color: "#94a3b8", padding: "24px" }}>
           読み込み中...
         </p>
       ) : ranking.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#888", padding: "24px" }}>
+        <p style={{ textAlign: "center", color: "#94a3b8", padding: "24px" }}>
           データがありません
         </p>
       ) : (
@@ -106,11 +106,11 @@ export default function MemoRanking({ type = "likes", limit = 10 }: MemoRankingP
                   <div style={{ fontWeight: "bold", fontSize: "14px" }}>
                     {memo.title}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#888" }}>
+                  <div style={{ fontSize: "12px", color: "#94a3b8" }}>
                     {memo.user?.display_name || "不明"}
                   </div>
                 </div>
-                <span style={{ fontSize: "14px", color: "#666" }}>
+                <span style={{ fontSize: "14px", color: "#94a3b8" }}>
                   {getMetric(memo)}
                 </span>
               </div>

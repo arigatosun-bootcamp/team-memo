@@ -81,7 +81,7 @@ export default function NewMemoPage() {
           style={{
             background: "none",
             border: "none",
-            color: "#a0a0b0",
+            color: "#64748b",
             cursor: "pointer",
             marginBottom: "1.5rem",
             fontSize: "0.875rem",
@@ -97,7 +97,7 @@ export default function NewMemoPage() {
         <MemoForm onSubmit={handleSubmit} isLoading={isLoading} submitLabel="作成" />
 
         <div style={{ marginTop: "1rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem", color: "#a0a0b0" }}>
+          <label style={{ display: "block", marginBottom: "0.5rem", color: "#64748b" }}>
             タグ
           </label>
           <TagInput

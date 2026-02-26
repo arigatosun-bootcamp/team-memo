@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 // GET: ユーザーのブックマーク一覧を取得
 // Bug 10（部分）: JOINで取得したmemoがRLSにより非公開メモの場合nullになるが、

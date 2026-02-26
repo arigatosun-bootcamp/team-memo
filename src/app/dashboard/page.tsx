@@ -50,15 +50,15 @@ export default function DashboardPage() {
           ダッシュボード
         </h1>
         {isLoading ? (
-          <p style={{ textAlign: "center", color: "#888" }}>読み込み中...</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>読み込み中...</p>
         ) : stats ? (
           <>
             {/* 統計カード */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}>
               {[
-                { label: "総メモ数", value: stats.totalMemos, color: "#4299e1" },
-                { label: "総いいね数", value: stats.totalLikes, color: "#e53e3e" },
-                { label: "総コメント数", value: stats.totalComments, color: "#38a169" },
+                { label: "総メモ数", value: stats.totalMemos, color: "#2563eb" },
+                { label: "総いいね数", value: stats.totalLikes, color: "#dc2626" },
+                { label: "総コメント数", value: stats.totalComments, color: "#16a34a" },
                 { label: "アクティブユーザー", value: stats.activeUsers, color: "#9f7aea" },
               ].map((item) => (
                 <div
@@ -73,7 +73,7 @@ export default function DashboardPage() {
                   <div style={{ fontSize: "32px", fontWeight: "bold", color: item.color }}>
                     {item.value}
                   </div>
-                  <div style={{ fontSize: "14px", color: "#888", marginTop: "4px" }}>
+                  <div style={{ fontSize: "14px", color: "#94a3b8", marginTop: "4px" }}>
                     {item.label}
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export default function DashboardPage() {
             </div>
           </>
         ) : (
-          <p style={{ textAlign: "center", color: "#888" }}>データの取得に失敗しました</p>
+          <p style={{ textAlign: "center", color: "#94a3b8" }}>データの取得に失敗しました</p>
         )}
       </main>
     </div>

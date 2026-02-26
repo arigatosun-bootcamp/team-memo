@@ -47,7 +47,7 @@ export default function MemoCard({ memo }: MemoCardProps) {
         <div style={{ display: "flex", gap: "8px" }}>
           <span className={styles.likes}>♥ {memo.likes_count}</span>
           {memo.comments_count > 0 && (
-            <span style={{ color: "#888", fontSize: "13px" }}>💬 {memo.comments_count}</span>
+            <span style={{ color: "#94a3b8", fontSize: "13px" }}>💬 {memo.comments_count}</span>
           )}
         </div>
       </div>

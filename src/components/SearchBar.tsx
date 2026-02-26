@@ -60,9 +60,9 @@ export default function SearchBar({
           minWidth: "200px",
           padding: "0.625rem 1rem",
           borderRadius: "6px",
-          border: "1px solid #2a2a4a",
-          backgroundColor: "#1a1a2e",
-          color: "#eee",
+          border: "1px solid #e2e8f0",
+          backgroundColor: "#f1f5f9",
+          color: "#1e293b",
           fontSize: "0.875rem",
         }}
       />
@@ -72,9 +72,9 @@ export default function SearchBar({
         style={{
           padding: "0.625rem 1rem",
           borderRadius: "6px",
-          border: "1px solid #2a2a4a",
-          backgroundColor: "#1a1a2e",
-          color: "#eee",
+          border: "1px solid #e2e8f0",
+          backgroundColor: "#f1f5f9",
+          color: "#1e293b",
           fontSize: "0.875rem",
         }}
       >
@@ -91,9 +91,9 @@ export default function SearchBar({
         style={{
           padding: "0.625rem 1rem",
           borderRadius: "6px",
-          border: "1px solid #2a2a4a",
-          backgroundColor: "#1a1a2e",
-          color: "#eee",
+          border: "1px solid #e2e8f0",
+          backgroundColor: "#f1f5f9",
+          color: "#1e293b",
           fontSize: "0.875rem",
         }}
       >
@@ -112,7 +112,7 @@ export default function SearchBar({
           padding: "0.625rem 1.25rem",
           borderRadius: "6px",
           border: "none",
-          backgroundColor: "#e94560",
+          backgroundColor: "#2563eb",
           color: "white",
           fontSize: "0.875rem",
           fontWeight: 500,

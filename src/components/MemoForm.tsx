@@ -37,7 +37,7 @@ export default function MemoForm({
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div>
-        <label htmlFor="title" style={{ display: "block", marginBottom: "0.5rem", color: "#a0a0b0" }}>
+        <label htmlFor="title" style={{ display: "block", marginBottom: "0.5rem", color: "#64748b" }}>
           タイトル
         </label>
         <input
@@ -51,16 +51,16 @@ export default function MemoForm({
             width: "100%",
             padding: "0.75rem",
             borderRadius: "6px",
-            border: "1px solid #2a2a4a",
-            backgroundColor: "#1a1a2e",
-            color: "#eee",
+            border: "1px solid #e2e8f0",
+            backgroundColor: "#f1f5f9",
+            color: "#1e293b",
             fontSize: "1rem",
           }}
         />
       </div>
 
       <div>
-        <label htmlFor="category" style={{ display: "block", marginBottom: "0.5rem", color: "#a0a0b0" }}>
+        <label htmlFor="category" style={{ display: "block", marginBottom: "0.5rem", color: "#64748b" }}>
           カテゴリ
         </label>
         <select
@@ -71,9 +71,9 @@ export default function MemoForm({
             width: "100%",
             padding: "0.75rem",
             borderRadius: "6px",
-            border: "1px solid #2a2a4a",
-            backgroundColor: "#1a1a2e",
-            color: "#eee",
+            border: "1px solid #e2e8f0",
+            backgroundColor: "#f1f5f9",
+            color: "#1e293b",
             fontSize: "1rem",
           }}
         >
@@ -86,7 +86,7 @@ export default function MemoForm({
       </div>
 
       <div>
-        <label htmlFor="content" style={{ display: "block", marginBottom: "0.5rem", color: "#a0a0b0" }}>
+        <label htmlFor="content" style={{ display: "block", marginBottom: "0.5rem", color: "#64748b" }}>
           本文
         </label>
         <textarea
@@ -100,9 +100,9 @@ export default function MemoForm({
             width: "100%",
             padding: "0.75rem",
             borderRadius: "6px",
-            border: "1px solid #2a2a4a",
-            backgroundColor: "#1a1a2e",
-            color: "#eee",
+            border: "1px solid #e2e8f0",
+            backgroundColor: "#f1f5f9",
+            color: "#1e293b",
             fontSize: "1rem",
             resize: "vertical",
           }}
@@ -116,7 +116,7 @@ export default function MemoForm({
           padding: "0.75rem 1.5rem",
           borderRadius: "6px",
           border: "none",
-          backgroundColor: "#e94560",
+          backgroundColor: "#2563eb",
           color: "white",
           fontSize: "1rem",
           fontWeight: 600,

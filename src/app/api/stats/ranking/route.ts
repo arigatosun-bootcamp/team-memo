@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 // GET: メモランキングを取得
 // Bug 13a: is_private フィルタなし → 非公開メモもランキングに含まれてしまう

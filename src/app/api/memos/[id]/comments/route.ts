@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notifications";
 
 // GET: メモのコメント一覧を取得（スレッド対応）
@@ -12,7 +12,7 @@ export async function GET(
   // 親コメント（parent_id が null）を取得し、返信はネストで取得
   const { data: comments, error } = await supabase
     .from("comments")
-    .select("*, user:profiles(display_name, avatar_url), replies:comments!parent_id(*, user:profiles(display_name, avatar_url))")
+    .select("*, user:profiles!comments_user_id_profiles_fkey(display_name, avatar_url), replies:comments!parent_id(*, user:profiles!comments_user_id_profiles_fkey(display_name, avatar_url))")
     .eq("memo_id", memoId)
     .is("parent_id", null)
     .order("created_at", { ascending: true });
@@ -48,10 +48,11 @@ export async function POST(
       content,
       parent_id: parent_id || null,
     })
-    .select("*, user:profiles(display_name, avatar_url)")
+    .select("*, user:profiles!comments_user_id_profiles_fkey(display_name, avatar_url)")
     .single();
 
   if (error) {
+    console.error("コメント挿入エラー:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

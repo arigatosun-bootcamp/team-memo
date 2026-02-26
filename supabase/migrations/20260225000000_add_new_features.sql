@@ -19,7 +19,9 @@ create table comments (
   content text not null,
   parent_id uuid references comments on delete cascade,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  -- profiles とのJOIN用外部キー（PostgREST のスキーマ検出に必要）
+  constraint comments_user_id_profiles_fkey foreign key (user_id) references profiles(id) on delete cascade
 );
 
 create index idx_comments_memo_id on comments (memo_id);
@@ -48,7 +50,10 @@ create table notifications (
   memo_id uuid references memos on delete set null,
   actor_id uuid references auth.users on delete set null,
   is_read boolean not null default false,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- profiles とのJOIN用外部キー（PostgREST のスキーマ検出に必要）
+  constraint notifications_user_id_profiles_fkey foreign key (user_id) references profiles(id) on delete cascade,
+  constraint notifications_actor_id_profiles_fkey foreign key (actor_id) references profiles(id) on delete set null
 );
 
 create index idx_notifications_user_id on notifications (user_id);

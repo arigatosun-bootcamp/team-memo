@@ -69,7 +69,7 @@ export default function AdminPage() {
               gap: "16px",
               fontWeight: "bold",
               fontSize: "13px",
-              color: "#888",
+              color: "#94a3b8",
             }}
           >
             <span>ユーザー</span>
@@ -78,11 +78,11 @@ export default function AdminPage() {
             <span>操作</span>
           </div>
           {isLoading ? (
-            <p style={{ padding: "24px", textAlign: "center", color: "#888" }}>
+            <p style={{ padding: "24px", textAlign: "center", color: "#94a3b8" }}>
               読み込み中...
             </p>
           ) : users.length === 0 ? (
-            <p style={{ padding: "24px", textAlign: "center", color: "#888" }}>
+            <p style={{ padding: "24px", textAlign: "center", color: "#94a3b8" }}>
               ユーザーがいません
             </p>
           ) : (
@@ -108,21 +108,21 @@ export default function AdminPage() {
                     padding: "2px 8px",
                     borderRadius: "12px",
                     backgroundColor: user.role === "admin" ? "#fed7d7" : "#e2e8f0",
-                    color: user.role === "admin" ? "#e53e3e" : "#666",
+                    color: user.role === "admin" ? "#dc2626" : "#94a3b8",
                     display: "inline-block",
                     width: "fit-content",
                   }}
                 >
                   {user.role === "admin" ? "管理者" : "メンバー"}
                 </span>
-                <span style={{ fontSize: "13px", color: "#888" }}>
+                <span style={{ fontSize: "13px", color: "#94a3b8" }}>
                   {new Date(user.created_at).toLocaleDateString("ja-JP")}
                 </span>
                 <button
                   onClick={() => handleDeleteUser(user.id)}
                   style={{
                     padding: "4px 12px",
-                    backgroundColor: "#e53e3e",
+                    backgroundColor: "#dc2626",
                     color: "white",
                     border: "none",
                     borderRadius: "4px",

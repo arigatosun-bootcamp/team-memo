@@ -36,7 +36,7 @@ export default function UserAvatar({
         width: size,
         height: size,
         borderRadius: "50%",
-        backgroundColor: "#4299e1",
+        backgroundColor: "#2563eb",
         color: "white",
         display: "flex",
         alignItems: "center",

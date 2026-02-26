@@ -65,7 +65,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
               position: "absolute",
               top: "-2px",
               right: "0",
-              backgroundColor: "#e53e3e",
+              backgroundColor: "#dc2626",
               color: "white",
               borderRadius: "50%",
               width: "18px",
@@ -107,7 +107,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
           >
             <span style={{ fontWeight: "bold", fontSize: "14px" }}>通知</span>
             {unreadCount > 0 && (
-              <span style={{ fontSize: "12px", color: "#e53e3e" }}>
+              <span style={{ fontSize: "12px", color: "#dc2626" }}>
                 {unreadCount}件の未読
               </span>
             )}
@@ -119,7 +119,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
               display: "block",
               padding: "12px 16px",
               textAlign: "center",
-              color: "#4299e1",
+              color: "#2563eb",
               textDecoration: "none",
               fontSize: "14px",
             }}

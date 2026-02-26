@@ -89,11 +89,11 @@ export default function ChatBot() {
           height: "56px",
           borderRadius: "50%",
           border: "none",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          background: "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
           color: "white",
           fontSize: "1.5rem",
           cursor: "pointer",
-          boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+          boxShadow: "0 4px 15px rgba(37, 99, 235, 0.4)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -103,12 +103,12 @@ export default function ChatBot() {
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = "scale(1.1)";
           e.currentTarget.style.boxShadow =
-            "0 6px 20px rgba(102, 126, 234, 0.6)";
+            "0 6px 20px rgba(37, 99, 235, 0.6)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "scale(1)";
           e.currentTarget.style.boxShadow =
-            "0 4px 15px rgba(102, 126, 234, 0.4)";
+            "0 4px 15px rgba(37, 99, 235, 0.4)";
         }}
         aria-label="チャットボットを開く"
       >
@@ -136,7 +136,7 @@ export default function ChatBot() {
           {/* ヘッダー */}
           <div
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
               padding: "1rem 1.25rem",
               display: "flex",
               alignItems: "center",
@@ -184,7 +184,7 @@ export default function ChatBot() {
               flex: 1,
               overflowY: "auto",
               padding: "1rem",
-              backgroundColor: "#0f0f23",
+              backgroundColor: "#ffffff",
               display: "flex",
               flexDirection: "column",
               gap: "0.75rem",
@@ -210,13 +210,13 @@ export default function ChatBot() {
                         ? "12px 12px 2px 12px"
                         : "12px 12px 12px 2px",
                     backgroundColor:
-                      msg.role === "user" ? "#667eea" : "#1a1a2e",
-                    color: msg.role === "user" ? "white" : "#eee",
+                      msg.role === "user" ? "#2563eb" : "#f1f5f9",
+                    color: msg.role === "user" ? "white" : "#1e293b",
                     fontSize: "0.875rem",
                     lineHeight: 1.5,
                     border:
                       msg.role === "assistant"
-                        ? "1px solid #2a2a4a"
+                        ? "1px solid #e2e8f0"
                         : "none",
                     whiteSpace: "pre-wrap",
                     wordBreak: "break-word",
@@ -232,10 +232,10 @@ export default function ChatBot() {
                   style={{
                     padding: "0.6rem 0.9rem",
                     borderRadius: "12px 12px 12px 2px",
-                    backgroundColor: "#1a1a2e",
-                    border: "1px solid #2a2a4a",
+                    backgroundColor: "#f1f5f9",
+                    border: "1px solid #e2e8f0",
                     fontSize: "0.875rem",
-                    color: "#a0a0b0",
+                    color: "#64748b",
                   }}
                 >
                   <span className="typing-dots">考え中...</span>
@@ -249,8 +249,8 @@ export default function ChatBot() {
           <div
             style={{
               padding: "0.75rem",
-              backgroundColor: "#16213e",
-              borderTop: "1px solid #2a2a4a",
+              backgroundColor: "#f8fafc",
+              borderTop: "1px solid #e2e8f0",
               display: "flex",
               gap: "0.5rem",
             }}
@@ -267,9 +267,9 @@ export default function ChatBot() {
                 flex: 1,
                 padding: "0.6rem 0.8rem",
                 borderRadius: "8px",
-                border: "1px solid #2a2a4a",
-                backgroundColor: "#0f0f23",
-                color: "#eee",
+                border: "1px solid #e2e8f0",
+                backgroundColor: "#ffffff",
+                color: "#1e293b",
                 fontSize: "0.875rem",
                 outline: "none",
               }}
@@ -283,9 +283,9 @@ export default function ChatBot() {
                 border: "none",
                 background:
                   isLoading || !input.trim()
-                    ? "#2a2a4a"
-                    : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: isLoading || !input.trim() ? "#666" : "white",
+                    ? "#e2e8f0"
+                    : "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
+                color: isLoading || !input.trim() ? "#94a3b8" : "white",
                 cursor: isLoading || !input.trim() ? "not-allowed" : "pointer",
                 fontSize: "0.875rem",
                 fontWeight: 500,
