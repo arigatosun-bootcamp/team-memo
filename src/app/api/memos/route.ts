@@ -16,17 +16,12 @@ export async function GET(request: NextRequest) {
     .eq("is_private", false)
     .order("updated_at", { ascending: false }); // メモ一覧を最新順でソート
 
-  // 検索条件とカテゴリフィルタを統合して1つのクエリで処理する
-  if (search || category) {
-    const conditions: string[] = [];
-    if (search) {
-      conditions.push(`title.ilike.%${search}%`);
-      conditions.push(`content.ilike.%${search}%`);
-    }
-    if (category) {
-      conditions.push(`category.eq.${category}`);
-    }
-    query = query.or(conditions.join(","));
+  // 検索条件（OR）とカテゴリフィルタ（AND）を分けて処理する
+  if (search) {
+    query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
+  }
+  if (category) {
+    query = query.eq("category", category);
   }
 
   // ページネーション: Supabaseのrangeはinclusive(両端含む)なので
