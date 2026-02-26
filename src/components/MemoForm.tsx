@@ -8,10 +8,12 @@ type MemoFormProps = {
   initialTitle?: string;
   initialContent?: string;
   initialCategory?: Category;
+  initialIsPrivate?: boolean;
   onSubmit: (data: {
     title: string;
     content: string;
     category: Category;
+    is_private: boolean;
   }) => void;
   isLoading?: boolean;
   submitLabel?: string;
@@ -21,6 +23,7 @@ export default function MemoForm({
   initialTitle = "",
   initialContent = "",
   initialCategory = "general",
+  initialIsPrivate = false,
   onSubmit,
   isLoading = false,
   submitLabel = "保存",
@@ -28,10 +31,11 @@ export default function MemoForm({
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
   const [category, setCategory] = useState<Category>(initialCategory);
+  const [isPrivate, setIsPrivate] = useState(initialIsPrivate);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ title, content, category });
+    onSubmit({ title, content, category, is_private: isPrivate });
   };
 
   return (
@@ -107,6 +111,26 @@ export default function MemoForm({
             resize: "vertical",
           }}
         />
+      </div>
+
+      <div>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            color: "#64748b",
+            cursor: "pointer",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={isPrivate}
+            onChange={(e) => setIsPrivate(e.target.checked)}
+            style={{ width: "1rem", height: "1rem" }}
+          />
+          非公開にする
+        </label>
       </div>
 
       <button

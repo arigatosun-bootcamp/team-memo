@@ -30,6 +30,7 @@ export default function NewMemoPage() {
     title: string;
     content: string;
     category: Category;
+    is_private: boolean;
   }) => {
     setIsLoading(true);
     try {
