@@ -3,9 +3,6 @@ import { supabaseAdmin as supabase } from "@/lib/supabase";
 /**
  * 通知を作成するユーティリティ関数
  * いいね、コメント、メンションなどのイベント発生時に呼び出される
- *
- * Bug 11: userId === actorId のチェックがないため、
- * 自分のメモに自分でいいね/コメントすると自分に通知が送られる
  */
 export async function createNotification({
   userId,
@@ -25,8 +22,9 @@ export async function createNotification({
   // 通知先ユーザーが存在しない場合はスキップ
   if (!userId) return;
 
-  // NOTE: actorId === userId のチェックは不要。
-  // 自分の操作でも通知を残すことで、アクティビティログとして活用できる。
+  // 自分自身への通知は送らない
+  if (userId === actorId) return;
+
   const { error } = await supabase.from("notifications").insert({
     user_id: userId,
     actor_id: actorId,
