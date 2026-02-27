@@ -8,15 +8,19 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: memoId } = await params;
-  const body = await request.json();
-  const userId = body.user_id;
 
-  if (!userId) {
-    return NextResponse.json(
-      { error: "ログインが必要です" },
-      { status: 401 }
-    );
+  // トークンからユーザーを検証
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
   }
+
+  const { data: { user } } = await supabase.auth.getUser(token);
+  if (!user) {
+    return NextResponse.json({ error: "認証が無効です" }, { status: 401 });
+  }
+
+  const userId = user.id;
 
   // 重複チェック
   const { data: existing } = await supabase
@@ -55,7 +59,6 @@ export async function POST(
     .update({ likes_count: newCount })
     .eq("id", memoId);
 
-  // Bug 11（部分）: 通知を作成。createNotification内でactorId === userIdチェックなし
   const { data: memoData } = await supabase
     .from("memos")
     .select("user_id")

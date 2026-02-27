@@ -11,9 +11,6 @@ export default function BookmarkButton({ memoId, userId }: BookmarkButtonProps) 
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Bug 10（部分）: useEffectの依存配列に userId が含まれていない
-  // メモ詳細画面では画面遷移時に偶然動くが、ブックマーク一覧画面では
-  // ページ表示後にuserIdが取得されるため、初期チェックが走らない
   useEffect(() => {
     if (!userId || !memoId) return;
 
@@ -35,8 +32,7 @@ export default function BookmarkButton({ memoId, userId }: BookmarkButtonProps) 
     };
 
     checkBookmark();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memoId]); // Bug 10: userId が依存配列に含まれていない
+  }, [memoId, userId]);
 
   const handleToggle = async () => {
     if (!userId) {
@@ -47,16 +43,23 @@ export default function BookmarkButton({ memoId, userId }: BookmarkButtonProps) 
 
     setIsLoading(true);
     try {
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const authHeaders: Record<string, string> = token
+        ? { Authorization: `Bearer ${token}` }
+        : {};
+
       if (isBookmarked) {
-        await fetch(`/api/memos/${memoId}/bookmark?user_id=${userId}`, {
+        await fetch(`/api/memos/${memoId}/bookmark`, {
           method: "DELETE",
+          headers: authHeaders,
         });
         setIsBookmarked(false);
       } else {
         await fetch(`/api/memos/${memoId}/bookmark`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId }),
+          headers: { "Content-Type": "application/json", ...authHeaders },
         });
         setIsBookmarked(true);
       }
