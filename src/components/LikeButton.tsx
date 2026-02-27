@@ -32,11 +32,17 @@ export default function LikeButton({
     setIsLiked(true);
 
     try {
-      // サーバーに送信
+      // トークンを取得してサーバーに送信
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
       const response = await fetch(`/api/memos/${memoId}/like`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId }),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       });
       const data = await response.json();
 
