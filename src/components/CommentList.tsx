@@ -10,7 +10,7 @@ type CommentListProps = {
   comments: Comment[];
   userId?: string;
   onCommentAdded: (comment: Comment) => void;
-  onCommentDeleted: (commentId: string) => void;
+  onCommentDeleted: (commentId: string, commentsCount: number) => void;
 };
 
 export default function CommentList({
@@ -31,10 +31,8 @@ export default function CommentList({
     );
 
     if (response.ok) {
-      // Bug 9（部分）: 親コメントのみUIから除去。
-      // CASCADEで返信も削除されるが、ここでは親のみ除去している
-      // 返信がUIに残ったまま表示される（リロードすると消える）
-      onCommentDeleted(commentId);
+      const data = await response.json();
+      onCommentDeleted(commentId, data.comments_count);
     }
   };
 
