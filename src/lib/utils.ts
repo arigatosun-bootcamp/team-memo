@@ -111,14 +111,11 @@ export function normalizeTag(tagName: string): string {
 
 /**
  * メモを日付ごとにグループ化する（統計用）
- * Bug 13b: サーバーサイドではUTCタイムゾーンで日付が計算されるため、
- * JSTの日付境界（0:00-8:59 JST = 前日UTC）でずれが発生する
  */
 export function groupByDate(items: { created_at: string }[]): Record<string, number> {
   const groups: Record<string, number> = {};
   for (const item of items) {
-    // toLocaleDateString はサーバー（UTC）とクライアント（JST）で異なる結果を返す
-    const dateKey = new Date(item.created_at).toLocaleDateString("ja-JP");
+    const dateKey = new Date(item.created_at).toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
     groups[dateKey] = (groups[dateKey] || 0) + 1;
   }
   return groups;

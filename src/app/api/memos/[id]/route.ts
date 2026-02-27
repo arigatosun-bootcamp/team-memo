@@ -66,7 +66,7 @@ export async function PATCH(
   // isPublic が true → 公開 → is_private を false にする
   const { data, error } = await supabase
     .from("memos")
-    .update({ is_private: isPublic })
+    .update({ is_private: !isPublic })
     .eq("id", id)
     .select()
     .single();
