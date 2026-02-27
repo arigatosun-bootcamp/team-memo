@@ -1,5 +1,5 @@
-// Bug 12（部分）: avatar_url に sanitizeUrl() を適用していない
-// javascript: プロトコルのURLが設定された場合、XSS脆弱性になる
+import { sanitizeUrl } from "@/lib/utils";
+
 type UserAvatarProps = {
   displayName: string;
   avatarUrl?: string | null;
@@ -13,12 +13,11 @@ export default function UserAvatar({
 }: UserAvatarProps) {
   const initial = displayName?.charAt(0)?.toUpperCase() || "?";
 
-  // Bug 12: sanitizeUrl() を使わずに直接 img タグの src に設定
-  // javascript: スキームのURLが入ると XSS になる
-  if (avatarUrl) {
+  const safeUrl = avatarUrl ? sanitizeUrl(avatarUrl) : "";
+  if (safeUrl) {
     return (
       <img
-        src={avatarUrl}
+        src={safeUrl}
         alt={displayName}
         width={size}
         height={size}

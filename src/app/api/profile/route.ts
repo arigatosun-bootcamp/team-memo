@@ -27,8 +27,6 @@ export async function GET(request: NextRequest) {
 }
 
 // PUT: プロフィールを更新
-// Bug 12: profiles テーブルは更新するが、auth.users の user_metadata は更新しない
-// Header.tsx は user_metadata.display_name を参照するため、Headerには古い名前が表示され続ける
 export async function PUT(request: NextRequest) {
   const { user_id, display_name, avatar_url } = await request.json();
 
@@ -54,11 +52,17 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // NOTE: auth.users の user_metadata も同時に更新する必要があるが、
-  // supabase.auth.updateUser() はサーバーサイドでは使えないケースがあるため、
-  // profiles テーブルの更新のみ行う。Header側で profiles テーブルから読むように
-  // 変更すれば整合性が取れる。
-  // → 実際にはサーバーサイドでも updateUser() は使用可能なので、この注釈は嘘
+  // auth.users の user_metadata も同期更新する
+  const { error: authError } = await supabase.auth.admin.updateUserById(user_id, {
+    user_metadata: {
+      display_name,
+      avatar_url: avatar_url || null,
+    },
+  });
+
+  if (authError) {
+    console.error("auth.usersのメタデータ更新に失敗:", authError);
+  }
 
   return NextResponse.json({ profile });
 }
