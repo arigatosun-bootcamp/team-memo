@@ -41,21 +41,10 @@ export async function POST(
     .from("likes")
     .insert({ user_id: userId, memo_id: memoId });
 
-  // カウント更新（非アトミック: SELECT → 計算 → UPDATE）
-  const { data: memo } = await supabase
-    .from("memos")
-    .select("likes_count")
-    .eq("id", memoId)
-    .single();
+  // アトミックにカウントを+1する
+  const { data: newCount } = await supabase
+    .rpc("increment_likes_count", { memo_id_input: memoId });
 
-  const newCount = (memo?.likes_count || 0) + 1;
-
-  await supabase
-    .from("memos")
-    .update({ likes_count: newCount })
-    .eq("id", memoId);
-
-  // Bug 11（部分）: 通知を作成。createNotification内でactorId === userIdチェックなし
   const { data: memoData } = await supabase
     .from("memos")
     .select("user_id")
@@ -72,5 +61,5 @@ export async function POST(
     });
   }
 
-  return NextResponse.json({ likes_count: newCount });
+  return NextResponse.json({ likes_count: newCount ?? 0 });
 }

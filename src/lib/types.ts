@@ -40,12 +40,11 @@ export type Comment = {
   replies?: Comment[];
 };
 
-// Bug 10: memo を Memo | null ではなく Memo として定義（RLSで非公開メモがnullになるケースを考慮していない）
 export type Bookmark = {
   id: string;
   user_id: string;
   memo_id: string;
-  memo: Memo;
+  memo: Memo | null;
   created_at: string;
 };
 

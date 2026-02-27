@@ -2,12 +2,6 @@ import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 /**
  * ユーザーが管理者かどうかを判定する
- *
- * Bug 15b: "owner" ロールは profiles テーブルに存在しない値
- * profiles.role は "member" | "admin" のみだが、"owner" も条件に含めている
- * これにより、一見 owner ロールも管理者として扱われるように見えるが、
- * 実際には profiles テーブルに "owner" を持つレコードは存在しないため、
- * この条件は常にfalseになる（無意味だが害はない...ように見える）
  */
 export async function isAdmin(userId: string): Promise<boolean> {
   if (!userId) return false;
@@ -18,8 +12,7 @@ export async function isAdmin(userId: string): Promise<boolean> {
     .eq("id", userId)
     .single();
 
-  // owner ロールも管理者として扱う（チームオーナー対応）
-  return data?.role === "admin" || data?.role === "owner";
+  return data?.role === "admin";
 }
 
 /**

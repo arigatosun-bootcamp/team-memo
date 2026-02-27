@@ -9,7 +9,6 @@ import BookmarkButton from "@/components/BookmarkButton";
 import Link from "next/link";
 import { formatDate, truncateText } from "@/lib/utils";
 
-// Bug 10（部分）: bookmark.memo がRLSによりnullになるケースでランタイムエラー
 export default function BookmarksPage() {
   const router = useRouter();
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
@@ -73,12 +72,11 @@ export default function BookmarksPage() {
                   href={`/memo/${bookmark.memo_id}`}
                   style={{ textDecoration: "none", color: "inherit", flex: 1 }}
                 >
-                  {/* Bug 10: bookmark.memo が null の場合ランタイムエラー */}
-                  <h3 style={{ fontSize: "16px", fontWeight: "bold", margin: "0 0 4px" }}>
-                    {bookmark.memo.title}
+                    <h3 style={{ fontSize: "16px", fontWeight: "bold", margin: "0 0 4px" }}>
+                    {bookmark.memo?.title ?? "（削除済みまたは非公開のメモ）"}
                   </h3>
                   <p style={{ fontSize: "13px", color: "#94a3b8", margin: "0 0 4px" }}>
-                    {truncateText(bookmark.memo.content, 100)}
+                    {bookmark.memo ? truncateText(bookmark.memo.content, 100) : ""}
                   </p>
                   <span style={{ fontSize: "12px", color: "#94a3b8" }}>
                     {formatDate(bookmark.created_at)}
