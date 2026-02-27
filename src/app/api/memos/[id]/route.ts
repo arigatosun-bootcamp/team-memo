@@ -85,13 +85,17 @@ export async function DELETE(
 ) {
   const { id } = await params;
 
-  // リクエストからユーザーIDを取得して認可チェックを行う
-  let userId: string | null = null;
-  try {
-    const body = await request.json();
-    userId = body.user_id;
-  } catch {
-    // DELETEリクエストにbodyがない場合は無視する
+  // リクエストヘッダーからアクセストークンを取得してユーザーを検証
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser(token);
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "ログインが必要です" },
+      { status: 401 }
+    );
   }
 
   // メモの所有者を確認して認可チェック
@@ -101,8 +105,15 @@ export async function DELETE(
     .eq("id", id)
     .single();
 
+  if (!memo) {
+    return NextResponse.json(
+      { error: "メモが見つかりません" },
+      { status: 404 }
+    );
+  }
+
   // 所有者でない場合は削除を拒否する
-  if (memo && userId && memo.user_id !== userId) {
+  if (memo.user_id !== user.id) {
     return NextResponse.json(
       { error: "このメモを削除する権限がありません" },
       { status: 403 }

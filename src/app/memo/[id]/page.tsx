@@ -64,8 +64,14 @@ export default function MemoDetailPage() {
   const handleDelete = async () => {
     if (!confirm("このメモを削除しますか？")) return;
 
+    const { supabase } = await import("@/lib/supabase");
+    const { data: { session } } = await supabase.auth.getSession();
+
     const response = await fetch(`/api/memos/${params.id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session?.access_token ?? ""}`,
+      },
     });
     if (response.ok) {
       router.push("/");
@@ -313,21 +319,23 @@ export default function MemoDetailPage() {
             >
               編集
             </button>
-            <button
-              onClick={handleDelete}
-              style={{
-                padding: "0.5rem 1rem",
-                borderRadius: "20px",
-                border: "1px solid #2563eb",
-                backgroundColor: "transparent",
-                color: "#2563eb",
-                cursor: "pointer",
-                fontSize: "0.875rem",
-                marginLeft: "auto",
-              }}
-            >
-              削除
-            </button>
+            {userId && memo.user_id === userId && (
+              <button
+                onClick={handleDelete}
+                style={{
+                  padding: "0.5rem 1rem",
+                  borderRadius: "20px",
+                  border: "1px solid #2563eb",
+                  backgroundColor: "transparent",
+                  color: "#2563eb",
+                  cursor: "pointer",
+                  fontSize: "0.875rem",
+                  marginLeft: "auto",
+                }}
+              >
+                削除
+              </button>
+            )}
           </div>
 
           {/* タグ表示 */}
