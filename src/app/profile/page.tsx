@@ -61,10 +61,8 @@ export default function ProfilePage() {
       if (response.ok) {
         const data = await response.json();
         setProfile(data.profile);
+        setUserName(data.profile.display_name);
         setMessage("プロフィールを更新しました");
-        // Bug 12: ここでは profiles テーブルのみ更新。
-        // Headerで表示される名前は auth.users の user_metadata から取得されるため、
-        // ページをリロードしても Header の名前は変わらない
       } else {
         setMessage("更新に失敗しました");
       }
