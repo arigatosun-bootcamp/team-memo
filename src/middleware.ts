@@ -4,17 +4,19 @@ import { createClient } from "@supabase/supabase-js";
 
 /**
  * 管理者パネルへのアクセスを制限するミドルウェア
- *
- * Bug 15a: matcher が "/admin/:path*" のみで、"/api/admin/:path*" を含んでいない
- * そのため、管理者画面にはアクセスできないが、管理者APIには誰でもアクセスできる
  */
 export async function middleware(request: NextRequest) {
-  // 管理者パスへのアクセスをチェック
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  // 管理者パス（画面・API両方）へのアクセスをチェック
+  if (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/api/admin")) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+    const isApiRequest = request.nextUrl.pathname.startsWith("/api/");
+
     if (!supabaseUrl || !supabaseAnonKey) {
+      if (isApiRequest) {
+        return NextResponse.json({ error: "サーバー設定エラー" }, { status: 500 });
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -22,6 +24,9 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get("sb-access-token")?.value;
 
     if (!token) {
+      if (isApiRequest) {
+        return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -35,6 +40,9 @@ export async function middleware(request: NextRequest) {
       } = await supabase.auth.getUser(token);
 
       if (!user) {
+        if (isApiRequest) {
+          return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+        }
         return NextResponse.redirect(new URL("/login", request.url));
       }
 
@@ -46,9 +54,15 @@ export async function middleware(request: NextRequest) {
         .single();
 
       if (!profile || profile.role !== "admin") {
+        if (isApiRequest) {
+          return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
+        }
         return NextResponse.redirect(new URL("/", request.url));
       }
     } catch {
+      if (isApiRequest) {
+        return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
@@ -56,7 +70,6 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Bug 15a: "/api/admin/:path*" が含まれていないため、APIルートは保護されない
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
