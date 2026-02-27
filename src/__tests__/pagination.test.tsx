@@ -12,10 +12,9 @@ describe("Pagination", () => {
         onPageChange={() => {}}
       />
     );
-    // rangeがinclusiveなのでperPage+1=11件ずつ表示
-    // 22 / 11 = 2ページ分のボタン + 前へ + 次へ = 4ボタン
+    // 22 / 10 = 3ページ分のボタン + 前へ + 次へ = 5ボタン
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(4);
+    expect(buttons).toHaveLength(5);
   });
 
   it("1ページのみの場合はページネーションを表示しない", () => {
@@ -27,7 +26,7 @@ describe("Pagination", () => {
         onPageChange={() => {}}
       />
     );
-    // 10 / 11 = 0.9... → ceil → 1ページ → 表示しない
+    // 10 / 10 = 1ページ → 表示しない
     expect(container.firstChild).toBeNull();
   });
 
@@ -41,7 +40,7 @@ describe("Pagination", () => {
         onPageChange={onPageChange}
       />
     );
-    // 33 / 11 = 3ページ
+    // 33 / 10 = 4ページ
     fireEvent.click(screen.getByText("2"));
     expect(onPageChange).toHaveBeenCalledWith(2);
   });

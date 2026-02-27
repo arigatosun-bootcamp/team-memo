@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
   }
 
   // ページネーション: Supabaseのrangeはinclusive(両端含む)なので
-  // perPage件取得するにはrange(start, start + perPage)とする
-  query = query.range((page - 1) * perPage, page * perPage);
+  // perPage件取得するにはrange(start, start + perPage - 1)とする
+  query = query.range((page - 1) * perPage, page * perPage - 1);
 
   const { data, error, count } = await query;
 

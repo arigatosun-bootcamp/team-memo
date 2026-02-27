@@ -14,8 +14,7 @@ export default function Pagination({
   onPageChange,
 }: PaginationProps) {
   // 総ページ数を計算（切り上げ）
-  // rangeがinclusiveで実際にはperPage+1件取得されるため、それに合わせて計算
-  const totalPages = Math.ceil(totalItems / (itemsPerPage + 1));
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   if (totalPages <= 1) return null;
 
