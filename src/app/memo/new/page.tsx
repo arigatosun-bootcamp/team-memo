@@ -48,7 +48,7 @@ export default function NewMemoPage() {
             await fetch(`/api/memos/${memo.id}/tags`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ tagId: tag.id }),
+              body: JSON.stringify({ tag_id: tag.id }),
             });
           }
         }
