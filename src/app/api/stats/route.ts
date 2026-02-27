@@ -25,8 +25,6 @@ export async function GET() {
   const totalLikes = memos.reduce((sum, m) => sum + m.likes_count, 0);
   const totalComments = memos.reduce((sum, m) => sum + m.comments_count, 0);
 
-  // Bug 13b: groupByDate()はサーバーサイドで実行されるためUTCタイムゾーンで日付が計算される
-  // フロントサイド（JST）で見ると、日本時間0:00-8:59に作成されたメモが前日にカウントされる
   const memosByDate = groupByDate(memos);
 
   // カテゴリ別集計
