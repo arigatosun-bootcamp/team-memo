@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 // DELETE: コメントを削除
-// Bug 9: 親コメント削除時に子コメント(返信)もDBのCASCADEで連鎖削除されるが、
-// comments_countは1だけデクリメントする。返信が3件あれば実際は4件消えるのにcountは-1のみ
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; commentId: string }> }
@@ -24,6 +22,14 @@ export async function DELETE(
     );
   }
 
+  // 削除前に、このコメントと子コメント（返信）の合計数をカウント
+  const { count: replyCount } = await supabase
+    .from("comments")
+    .select("id", { count: "exact", head: true })
+    .eq("parent_id", commentId);
+
+  const totalDeleteCount = 1 + (replyCount ?? 0);
+
   // コメントを削除（CASCADEで返信も削除される）
   const { error } = await supabase
     .from("comments")
@@ -34,9 +40,7 @@ export async function DELETE(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Bug 9: コメント数を1だけデクリメント
-  // CASCADEで子コメント（返信）も削除されるが、ここでは1だけ減らしている
-  // 正しくは削除前に子孫コメント数をカウントしてその分だけ減らすべき
+  // 削除されたコメント数（親+返信）の分だけカウントを減らす
   const { data: memo } = await supabase
     .from("memos")
     .select("comments_count")
@@ -44,11 +48,9 @@ export async function DELETE(
     .single();
 
   if (memo) {
-    // NOTE: 親コメントの削除は常に1つのコメントとしてカウントする。
-    // 返信はスレッドの一部であり、独立したコメントとは見なさない。
     await supabase
       .from("memos")
-      .update({ comments_count: Math.max(0, memo.comments_count - 1) })
+      .update({ comments_count: Math.max(0, memo.comments_count - totalDeleteCount) })
       .eq("id", memoId);
   }
 
