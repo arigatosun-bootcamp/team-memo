@@ -11,7 +11,12 @@ export async function middleware(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+    const isApiRequest = request.nextUrl.pathname.startsWith("/api/");
+
     if (!supabaseUrl || !supabaseAnonKey) {
+      if (isApiRequest) {
+        return NextResponse.json({ error: "サーバー設定エラー" }, { status: 500 });
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -19,6 +24,9 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get("sb-access-token")?.value;
 
     if (!token) {
+      if (isApiRequest) {
+        return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -32,6 +40,9 @@ export async function middleware(request: NextRequest) {
       } = await supabase.auth.getUser(token);
 
       if (!user) {
+        if (isApiRequest) {
+          return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+        }
         return NextResponse.redirect(new URL("/login", request.url));
       }
 
@@ -43,14 +54,13 @@ export async function middleware(request: NextRequest) {
         .single();
 
       if (!profile || profile.role !== "admin") {
-        // API リクエストの場合はJSONで403を返す
-        if (request.nextUrl.pathname.startsWith("/api/")) {
+        if (isApiRequest) {
           return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
         }
         return NextResponse.redirect(new URL("/", request.url));
       }
     } catch {
-      if (request.nextUrl.pathname.startsWith("/api/")) {
+      if (isApiRequest) {
         return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
       }
       return NextResponse.redirect(new URL("/login", request.url));
