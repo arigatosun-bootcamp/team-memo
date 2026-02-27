@@ -15,12 +15,19 @@ export default function AdminPage() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserName(user.user_metadata?.display_name);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        router.push("/login");
+        return;
       }
+      setUserName(user.user_metadata?.display_name);
 
-      const response = await fetch("/api/admin/users");
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const response = await fetch("/api/admin/users", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users || []);
@@ -28,14 +35,20 @@ export default function AdminPage() {
       setIsLoading(false);
     };
     init();
-  }, []);
+  }, [router]);
 
   const handleDeleteUser = async (userId: string) => {
     if (!confirm("このユーザーを削除しますか？この操作は取り消せません。")) return;
 
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+
     const response = await fetch("/api/admin/users", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ user_id: userId }),
     });
 
