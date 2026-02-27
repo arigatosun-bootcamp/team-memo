@@ -1,46 +1,39 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type NotificationBellProps = {
   userId?: string;
 };
 
-// Bug 11（部分）: useEffectの依存配列にfetchUnreadCountが含まれているが、
-// fetchUnreadCountはuseCallback無しで毎レンダリングで再生成されるため、
-// setIntervalが再レンダリングのたびに再作成される
 export default function NotificationBell({ userId }: NotificationBellProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Bug 11: useCallback無しの関数定義 → 毎レンダリングで新しい参照が生成される
-  const fetchUnreadCount = async () => {
-    if (!userId) return;
-    try {
-      const response = await fetch(
-        `/api/notifications?user_id=${userId}&unread_only=true`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setUnreadCount(data.unreadCount);
-      }
-    } catch {
-      // エラー時は何もしない
-    }
-  };
-
   useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!userId) return;
+      try {
+        const response = await fetch(
+          `/api/notifications?user_id=${userId}&unread_only=true`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUnreadCount(data.unreadCount);
+        }
+      } catch {
+        // エラー時は何もしない
+      }
+    };
+
     fetchUnreadCount();
 
     // 5秒ごとにポーリング
     const interval = setInterval(fetchUnreadCount, 5000);
 
     return () => clearInterval(interval);
-  // Bug 11: fetchUnreadCount は毎レンダリングで新しい参照になるため、
-  // このuseEffectは再レンダリングのたびに実行される（インターバルが再作成される）
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchUnreadCount]); // 正しくは [] にするか、fetchUnreadCountをuseCallbackで安定化すべき
+  }, [userId]);
 
   if (!userId) return null;
 
