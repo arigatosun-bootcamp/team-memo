@@ -10,8 +10,6 @@ type TagInputProps = {
   onTagsChange: (tags: Tag[]) => void;
 };
 
-// Bug 14（部分）: オートコンプリートが大文字小文字を区別して比較する
-// DBには小文字で正規化されたタグが保存されているが、ユーザー入力はそのまま比較
 export default function TagInput({ selectedTags, onTagsChange }: TagInputProps) {
   const [input, setInput] = useState("");
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -36,11 +34,10 @@ export default function TagInput({ selectedTags, onTagsChange }: TagInputProps) 
   const handleInputChange = (value: string) => {
     setInput(value);
     if (value.trim()) {
-      // Bug 14: 大文字小文字を区別して比較（.includes は case-sensitive）
-      // 例: "React" と入力しても、DB上の "react" タグは候補に表示されない
+      const normalizedValue = value.trim().toLowerCase();
       const filtered = allTags.filter(
         (tag) =>
-          tag.name.includes(value.trim()) &&
+          tag.name.toLowerCase().includes(normalizedValue) &&
           !selectedTags.some((t) => t.id === tag.id)
       );
       setSuggestions(filtered);
