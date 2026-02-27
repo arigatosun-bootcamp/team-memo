@@ -363,10 +363,9 @@ export default function MemoDetailPage() {
               }
               setMemo((prev) => prev ? { ...prev, comments_count: prev.comments_count + 1 } : null);
             }}
-            onCommentDeleted={(commentId) => {
-              // Bug 9（部分）: 親コメントのみ除去。返信は残ったまま
+            onCommentDeleted={(commentId, commentsCount) => {
               setComments((prev) => prev.filter((c) => c.id !== commentId));
-              setMemo((prev) => prev ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) } : null);
+              setMemo((prev) => prev ? { ...prev, comments_count: commentsCount } : null);
             }}
           />
         </article>
