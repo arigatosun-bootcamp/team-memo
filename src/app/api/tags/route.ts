@@ -16,7 +16,6 @@ export async function GET() {
 }
 
 // POST: 新しいタグを作成
-// Bug 14（部分）: UNIQUE制約エラー(23505)を適切にハンドリングせず一律500を返す
 export async function POST(request: NextRequest) {
   const { name, color } = await request.json();
 
@@ -36,9 +35,19 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  // Bug 14: UNIQUE制約エラーの場合も一律500を返す
-  // 正しくは 23505 (unique_violation) を判別して既存タグを返すべき
   if (error) {
+    // UNIQUE制約エラーの場合は既存タグを返す
+    if (error.code === "23505") {
+      const { data: existingTag } = await supabase
+        .from("tags")
+        .select("*")
+        .eq("name", normalizedName)
+        .single();
+
+      if (existingTag) {
+        return NextResponse.json({ tag: existingTag });
+      }
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
